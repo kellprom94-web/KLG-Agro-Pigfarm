@@ -1,0 +1,865 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#B9475E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="KLG Agro Pigfarm">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>KLG Agro Pigfarm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Golos+Text:wght@400;500;600;700&display=swap">
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;font:14px/1.45 system-ui,-apple-system,sans-serif}
+img{max-width:100%}[hidden]{display:none!important}
+.login{display:flex;flex-direction:column;gap:12px;max-width:420px;margin:24px auto}
+.login .logo{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.login .logo svg{width:64px;height:64px}
+.login .logo b{font-family:var(--f-display);font-size:26px}
+.login .logo b span{font-weight:500;color:var(--good)}
+.offline{position:fixed;left:0;right:0;top:0;z-index:40;text-align:center;font-size:12px;font-weight:600;padding:calc(4px + env(safe-area-inset-top,0px)) 8px 4px;background:var(--warn);color:#fff}
+
+/* Layout: one-column phone app, sticky header, bottom tab bar, floating "+" that opens a bottom sheet */
+:root{
+  --bg:#EDF0EE; --surface:#FFFFFF; --line:#D8DEDA; --ink:#17201C; --muted:#5F6B65;
+  --accent:#B9475E; --accent-ink:#FFFFFF; --accent-soft:#F6E3E7;
+  --good:#2F7D55; --warn:#A86A12; --bad:#B23A3A;
+  --f-display:"Unbounded","Golos Text",system-ui,sans-serif;
+  --f-body:"Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --r:14px; --leaf:#5DA86E;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#121715; --surface:#1B2220; --line:#2C3632; --ink:#E7ECE9; --muted:#97A39D;
+  --accent:#E07C91; --accent-ink:#1A0E11; --accent-soft:#3A2228;
+  --good:#5DBB88; --warn:#E0A64B; --bad:#E57373; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121715; --surface:#1B2220; --line:#2C3632; --ink:#E7ECE9; --muted:#97A39D;
+  --accent:#E07C91; --accent-ink:#1A0E11; --accent-soft:#3A2228;
+  --good:#5DBB88; --warn:#E0A64B; --bad:#E57373; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0 120px;max-width:640px;margin:0 auto}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);
+  display:flex;align-items:center;gap:12px;padding-block:14px 10px}
+.brand{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.mark{width:42px;height:42px;flex:none}
+.bt{min-width:0}
+.bname{font-family:var(--f-display);font-weight:700;font-size:12px;letter-spacing:.04em;color:var(--ink);line-height:1.1}
+.bname span{font-weight:500;color:var(--good)}
+header.top h1{font-family:var(--f-display);font-weight:700;font-size:19px;margin:0;flex:1;letter-spacing:-.01em;text-wrap:balance}
+.iconbtn{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center}
+.iconbtn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8}
+.monthbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 0 14px}
+.monthbar b{font-weight:600}
+.monthbar button{border:1px solid var(--line);background:var(--surface);border-radius:10px;width:36px;height:36px}
+section{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.card h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-weight:600}
+.hero{background:var(--ink);color:var(--bg);border:none}
+.hero .big{font-family:var(--f-display);font-size:44px;font-weight:700;line-height:1;letter-spacing:-.02em}
+.hero .lbl{opacity:.75;font-size:13px;margin-top:6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.chip{border-radius:999px;padding:4px 10px;font-size:13px;background:rgba(127,127,127,.18)}
+.chip b{font-weight:700}
+.kv{display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:baseline}
+.kv dt{color:var(--muted)} .kv dd{margin:0;text-align:right;font-weight:600}
+.bars{display:flex;flex-direction:column;gap:10px}
+.bar .row{display:flex;justify-content:space-between;gap:8px;font-size:14px}
+.bar .track{height:8px;border-radius:4px;background:var(--bg);margin-top:4px;overflow:hidden}
+.bar .fill{height:100%;background:var(--accent);border-radius:4px}
+.total{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding-top:10px;margin-top:4px;font-weight:700}
+.list{display:flex;flex-direction:column}
+.li{display:flex;gap:12px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line);background:none;border-left:0;border-right:0;border-top:0;text-align:left;width:100%}
+.li:last-child{border-bottom:0}
+.li .main{flex:1;min-width:0}
+.li .t{font-weight:600;overflow-wrap:anywhere}
+.li .s{color:var(--muted);font-size:13px;overflow-wrap:anywhere}
+.li .v{text-align:right;font-weight:600;white-space:nowrap}
+.li .v small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+.tag{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:6px;background:var(--bg);color:var(--muted)}
+.tag.plus{color:var(--good)} .tag.minus{color:var(--bad)} .tag.move{color:var(--accent)}
+.pill{font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px}
+.pill.low{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+.pill.neg{background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad)}
+.date{width:46px;flex:none;text-align:center;font-size:12px;color:var(--muted);line-height:1.15}
+.date b{display:block;font-size:18px;color:var(--ink);font-family:var(--f-display);font-weight:500}
+.empty{color:var(--muted);text-align:center;padding:18px 8px}
+.seg{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px}
+.seg button{flex:1;min-width:0;border:0;background:none;border-radius:9px;padding:8px 4px;font-size:13px;font-weight:600;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--ink)}
+.banner{font-size:13px;color:var(--warn);background:color-mix(in srgb,var(--warn) 12%,transparent);border-radius:10px;padding:8px 12px}
+.demo-note{font-size:13px;color:var(--muted);display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.linkbtn{border:0;background:none;color:var(--accent);font-weight:600;padding:4px 0}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--surface);border-top:1px solid var(--line);
+  display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom,0px);
+  padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+nav.tabs .in{display:flex;width:100%;max-width:640px}
+nav.tabs button{flex:1;border:0;background:none;padding:9px 2px 10px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--muted);font-weight:500}
+nav.tabs svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.7}
+nav.tabs button[aria-current="page"]{color:var(--accent)}
+.vbtn{position:relative}
+.badge{position:absolute;top:4px;left:calc(50% + 6px);min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--bad);color:#fff;font-size:11px;font-weight:700;line-height:18px;text-align:center}
+.pill.due{background:var(--accent-soft);color:var(--accent)}
+.pill.soon{background:var(--bg);color:var(--muted)}
+.note{font-size:13px;color:var(--muted);background:var(--bg);border-radius:10px;padding:10px 12px;margin:0}
+.sheet .kv dd{text-align:left}
+.stat{display:flex;flex-wrap:wrap;gap:6px}
+.pill.preg{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent)}
+.pill.lact{background:color-mix(in srgb,var(--good) 16%,transparent);color:var(--good)}
+.pill.open{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.pill.ret{background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad)}
+.pill.cull,.pill.none{background:var(--bg);color:var(--muted)}
+.btns.wrap{flex-wrap:wrap}.btns.wrap .btn{flex:1 1 30%}
+.fab{position:fixed;z-index:11;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(76px + env(safe-area-inset-bottom,0px));
+  width:58px;height:58px;border-radius:18px;border:0;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;
+  box-shadow:0 6px 18px color-mix(in srgb,var(--accent) 40%,transparent)}
+.fab svg{width:28px;height:28px;stroke:currentColor;stroke-width:2.2;fill:none}
+.scrim{position:fixed;inset:0;z-index:20;background:rgba(10,14,12,.45)}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;margin:0 auto;max-width:640px;max-height:90%;overflow-y:auto;
+  background:var(--surface);border-radius:20px 20px 0 0;padding:8px 16px calc(20px + env(safe-area-inset-bottom,0px));
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.grab{width:40px;height:4px;border-radius:2px;background:var(--line);margin:6px auto 12px}
+.sheet h3{font-family:var(--f-display);font-weight:500;font-size:18px;margin:0 0 14px}
+.sheet h4{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:16px 0 8px;font-weight:600}
+.acts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.act{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:12px;text-align:left;font-weight:600}
+.act small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+form{display:flex;flex-direction:column;gap:12px}
+label.f{display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--muted);font-weight:500}
+label.f input,label.f select,label.f textarea{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:11px 12px;font-size:16px;color:var(--ink);width:100%;min-width:0}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.hint{font-size:12px;color:var(--muted);margin-top:-4px}
+.err{color:var(--bad);font-size:14px;font-weight:500}
+.btns{display:flex;gap:10px;margin-top:6px}
+.btn{flex:1;border-radius:12px;padding:13px;font-weight:700;border:1px solid var(--line);background:var(--bg)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.danger{color:var(--bad)}
+.btn.danger.armed{background:var(--bad);color:#fff;border-color:var(--bad)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(150px + env(safe-area-inset-bottom,0px));z-index:30;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;font-size:14px;max-width:calc(100% - 32px)}
+@media (prefers-reduced-motion:no-preference){.sheet{animation:up .22s ease-out}@keyframes up{from{transform:translateY(30px);opacity:.6}}}
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+</head>
+<body>
+
+<header class="top"><div class="brand"><svg class="mark" viewBox="0 0 64 64" role="img" aria-label="KLG Agro Pigfarm"><rect x="0" y="0" width="64" height="64" rx="16" fill="var(--accent)"/><path d="M32 21V11.5" stroke="var(--leaf)" stroke-width="2" stroke-linecap="round"/><path d="M32 14c2.5-5 8-6.5 11.5-5.5c-1 4.5-6.5 7.5-11.5 5.5z" fill="var(--leaf)"/><path d="M32 16.5c-2-3.5-6-4.5-8.5-3.8c.8 3.2 4.8 5.3 8.5 3.8z" fill="var(--leaf)"/><path d="M13 14l11 9-12 6z" fill="#fff"/><path d="M51 14l-11 9 12 6z" fill="#fff"/><ellipse cx="32" cy="37" rx="20" ry="17" fill="#fff"/><circle cx="24.5" cy="31.5" r="2.4" fill="var(--accent)"/><circle cx="39.5" cy="31.5" r="2.4" fill="var(--accent)"/><ellipse cx="32" cy="42.5" rx="9.5" ry="6.5" fill="var(--accent)"/><ellipse cx="28.6" cy="42.5" rx="1.9" ry="2.6" fill="#fff"/><ellipse cx="35.4" cy="42.5" rx="1.9" ry="2.6" fill="#fff"/></svg><div class="bt"><div class="bname">KLG <span>Agro</span> Pigfarm</div><h1 id="ttl">Свиноферма</h1></div></div>
+<button class="iconbtn" data-a="settings" aria-label="Довідники та налаштування"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="18" r="2"/></svg></button></header>
+<main id="app"><p class="empty">Завантаження даних…</p></main>
+<button class="fab" data-a="add" aria-label="Новий запис"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+<nav class="tabs"><div class="in">
+<button data-tab="home"><svg viewBox="0 0 24 24"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg>Свиноферма</button>
+<button data-tab="herd"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="13" rx="8" ry="6"/><circle cx="10" cy="12" r=".6"/><circle cx="14" cy="12" r=".6"/><path d="M7 8 5 4M17 8l2-4"/></svg>Поголів'я</button>
+<button data-tab="stock"><svg viewBox="0 0 24 24"><path d="M4 8l8-4 8 4v10l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v10"/></svg>Склад</button>
+<button data-tab="vet" class="vbtn"><span class="badge" id="vbadge" hidden></span><svg viewBox="0 0 24 24"><path d="M15 3l6 6M18 6l-9 9-3 1 1-3 9-9M6 18l-3 3"/></svg>Ветеринарія</button>
+<button data-tab="money"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg>Гроші</button>
+</div></nav>
+<div id="layer"></div>
+
+<script>
+const DEMO=[];
+const COLS=['groups','items','workers','moves','stock','vet','costs','pay','vetplan','vetskip','sows','sowev','prod','supay'];
+const S={};COLS.forEach(c=>S[c]=[]);
+let db=null,mode='loading',tab='home',month='',moneyView='costs',herdShow=40,vetView='rem',herdView='sows';
+const GROUP_CATS=['Свиноматки','Кнури','Ремонтні свинки','Поросята-сисуни','Дорощування','Відгодівля'];
+const UNITS=['кг','т','л','мл','доза','шт','фл','уп'];
+const EXP_USE='У витрати при використанні',EXP_NOW='Одразу у витрати';
+const ITEM_CATS=['Готовий корм','Сировина','Ветпрепарат','Сперма','Інше','Корм'];
+const isFeed=c=>c==='Готовий корм'||c==='Корм'||c==='Сировина';
+const VET_KINDS=['Щеплення','Лікування','Обробка','Огляд'];
+const A_BIRTH='Від дати опоросу',A_MATE='Від дати осіменіння',A_PRE='До очікуваного опоросу',A_WEAN='Від дати відлучення',A_NONE='Без прив\'язки до дати';
+const ANCHORS=[A_BIRTH,A_MATE,A_PRE,A_WEAN,A_NONE];
+const ACT_VET='Ветобробка',ACT_DONE='Позначка «виконано»',ACT_MATE='Осіменіння',ACT_FARROW='Опорос',ACT_WEAN='Відлучення';
+const ACTIONS=[ACT_VET,ACT_DONE,ACT_MATE,ACT_FARROW,ACT_WEAN];
+const GEST=114;
+const PLAN_TARGETS=['Поросята','Свиноматки','Ремонтні свинки','Кнури','Дорощування','Відгодівля'];
+const PLAN_DRUGS={"p_navel": "Йод 5% або антисептичний спрей", "p_fe": "Препарат заліза (напр. Урсоферан, Ферран)", "p_cocc": "Толтразурил 5% (напр. Байкокс 5%)", "p_castr": "Антисептичний / алюмінієвий спрей на рану", "p_myco": "Вакцина M. hyo (напр. Інгельвак МайкоФЛЕКС, Порцилис М Hyo)", "p_pcv": "Вакцина PCV2 (напр. Інгельвак ЦиркоФЛЕКС, Порцилис PCV)", "p_worm1": "Івермектин або фенбендазол (напр. Івермек, Панакур)", "p_ery": "Вакцина проти бешихи (напр. Порцилис Ery)", "p_worm2": "Івермектин або фенбендазол (напр. Івермек, Панакур)", "p_s_ecoli1": "Вакцина E. coli + клостридії (напр. Порцилис ColiClos, Нео-Коліпор)", "p_s_ecoli2": "Та сама вакцина, що й 1-ше щеплення", "p_s_worm": "Івермектин або фенбендазол (напр. Івермек, Панакур)", "p_s_move": "Дезінфектант (напр. Сталосан)", "p_s_mma": "Якщо є проблеми — за призначенням ветлікаря", "p_sow": "Вакцина Парво + Бешиха (напр. Порцилис Ery+Parvo)", "p_g3": "Вакцина Парво + Бешиха (напр. Порцилис Ery+Parvo)", "p_g4": "Вакцина Парво + Бешиха; Івермектин або фенбендазол"};
+const DEFAULT_PLAN=[
+ ['p_navel','Обробка пуповини, огляд поросят','Поросята',A_BIRTH,1,1,ACT_VET,'Йодовмісний розчин; перевірити, що всі отримали молозиво'],
+ ['p_fe','Препарат заліза (профілактика анемії)','Поросята',A_BIRTH,3,4,ACT_VET,'Внутрішньом\'язово, доза за інструкцією препарату'],
+ ['p_cocc','Кокцидіостат (толтразурил)','Поросята',A_BIRTH,3,5,ACT_VET,'Перорально, одноразово'],
+ ['p_castr','Кастрація кнурців','Поросята',A_BIRTH,5,10,ACT_VET,'Рану обробити антисептиком'],
+ ['p_myco','Вакцина проти мікоплазмозу','Поросята',A_BIRTH,14,21,ACT_VET,'За схемою вакцини (одно- чи дворазова)'],
+ ['p_pcv','Вакцина проти цирковірусу (PCV2)','Поросята',A_BIRTH,21,24,ACT_VET,'Можна разом з мікоплазмозною, якщо це дозволяє інструкція'],
+ ['p_worm1','Дегельмінтизація','Поросята',A_BIRTH,35,45,ACT_VET,'Через 1–2 тижні після відлучення'],
+ ['p_ery','Вакцина проти бешихи (рожі)','Дорощування',A_BIRTH,60,70,ACT_VET,''],
+ ['p_worm2','Повторна дегельмінтизація','Відгодівля',A_BIRTH,90,100,ACT_VET,'Перед постановкою на відгодівлю'],
+ ['p_s_ret','Перевірка на повторну охоту','Свиноматки',A_MATE,18,24,ACT_DONE,'Якщо охота повторилась — осіменити знову'],
+ ['p_s_scan','УЗД на поросність','Свиноматки',A_MATE,28,35,ACT_DONE,'Непоросних — на повторне осіменіння або вибраковку'],
+ ['p_s_ecoli1','Вакцина проти колібактеріозу та клостридіозу (1-ша)','Свиноматки',A_PRE,42,35,ACT_VET,'Захищає поросят через молозиво; за інструкцією вакцини'],
+ ['p_s_ecoli2','Вакцина проти колібактеріозу та клостридіозу (2-га)','Свиноматки',A_PRE,21,14,ACT_VET,''],
+ ['p_s_worm','Дегельмінтизація свиноматки','Свиноматки',A_PRE,14,7,ACT_VET,'Щоб не заразити поросят'],
+ ['p_s_move','Мийка й дезінфекція станка, переведення в маточник','Свиноматки',A_PRE,7,3,ACT_DONE,'Свиноматку помити перед переведенням'],
+ ['p_s_farrow','Очікуваний опорос','Свиноматки',A_PRE,2,0,ACT_FARROW,'Чергування біля станка; внесіть опорос, щойно він відбудеться'],
+ ['p_s_mma','Контроль після опоросу: температура, вим\'я, апетит','Свиноматки',A_BIRTH,1,3,ACT_DONE,'Температура понад 39,5 °C або тверде вим\'я — викликати ветлікаря'],
+ ['p_sow','Вакцина проти парвовірусу та бешихи','Свиноматки',A_BIRTH,15,21,ACT_VET,'У лактацію, за 2–3 тижні до осіменіння'],
+ ['p_s_wean','Відлучення поросят','Свиноматки',A_BIRTH,26,28,ACT_WEAN,'Типово на 21–28 добу'],
+ ['p_s_heat','Перевірка на охоту й осіменіння','Свиноматки',A_WEAN,3,7,ACT_MATE,'Охота зазвичай настає на 4–7 день після відлучення'],
+ ['p_g3','Вакцина проти парвовірусу та бешихи','Ремонтні свинки',A_NONE,null,null,ACT_VET,'Двічі з інтервалом 3–4 тижні; друга — за 2–3 тижні до першого осіменіння'],
+ ['p_g4','Вакцинація від парвовірусу й бешихи, дегельмінтизація','Кнури',A_NONE,null,null,ACT_VET,'Кожні 6 місяців'],
+].map(([id,name,target,anchor,from,to,action,what],i)=>({id,data:{name,target,anchor,drug:PLAN_DRUGS[id]||'',...(from==null?{}:{from,to}),action,what,std:true,t:i+1}}));
+const COST_CATS=['Електроенергія','Пальне','Ремонт','Транспорт','Газ / опалення','Інше'];
+const MON=['Січень','Лютий','Березень','Квітень','Травень','Червень','Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'];
+const MONS=['січ','лют','бер','кві','тра','чер','лип','сер','вер','жов','лис','гру'];
+const nf=new Intl.NumberFormat('uk-UA',{maximumFractionDigits:1});
+const mf=new Intl.NumberFormat('uk-UA',{maximumFractionDigits:0});
+const n=v=>nf.format(+v||0), money=v=>mf.format(Math.round(+v||0))+' ₴';
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+month=today().slice(0,7);
+const byId=(c,id)=>S[c].find(x=>x.id===id);
+const gname=id=>byId('groups',id)?.name||'—';
+const sortJ=a=>a.slice().sort((x,y)=>(y.date||'').localeCompare(x.date||'')||(y.t||0)-(x.t||0));
+const inMonth=d=>(d||'').slice(0,7)===month;
+
+/* ---------- storage ---------- */
+function saveLocal(){try{localStorage.setItem('svyn',JSON.stringify(S))}catch(e){}}
+function loadLocal(){try{const j=JSON.parse(localStorage.getItem('svyn')||'null');if(j)COLS.forEach(c=>S[c]=j[c]||[])}catch(e){}}
+async function put(col,id,data){
+  data={...data};if(!data.t)data.t=Date.now();
+  if(db){const ref=id?db.collection(col).doc(id):db.collection(col).doc();ref.set(data).catch(e=>toast(saveErr(e)));return}
+  id=id||('x'+Date.now().toString(36)+Math.random().toString(36).slice(2,6));
+  const i=S[col].findIndex(x=>x.id===id);const doc={id,...data};
+  if(i>=0)S[col][i]=doc;else S[col].push(doc);saveLocal();schedule();
+}
+async function del(col,id){
+  if(db){db.collection(col).doc(id).delete().catch(e=>toast(saveErr(e)));return}
+  S[col]=S[col].filter(x=>x.id!==id);saveLocal();schedule();
+}
+async function loadDemo(){for(const d of DEMO)await put(d.col,d.id,d.data);if(!S.vetplan.length)await addStdPlan(true);toast('Приклад завантажено')}
+async function addStdPlan(quiet){for(const p of DEFAULT_PLAN)if(!byId('vetplan',p.id))await put('vetplan',p.id,p.data);if(!quiet)toast('Типову схему додано')}
+function addDays(d,k){const x=new Date(d+'T12:00:00');x.setDate(x.getDate()+k);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')}
+const fmtD=d=>{const[,m,dd]=d.split('-');return dd+'.'+m};
+const ageDays=d=>Math.round((new Date(today()+'T12:00:00')-new Date(d+'T12:00:00'))/864e5)+1;
+function planDrug(p,sc){const it=byId('items',p.item);if(it){sc=sc||stockCalc();const b=sc[it.id]?.bal||0;return{text:it.name,stock:b,unit:it.unit,linked:true}}return p.drug?{text:p.drug}:null}
+const drugLine=(p,sc)=>{const d=planDrug(p,sc);if(!d)return '';return `<div class="s" style="color:var(--ink)"><b>Препарат:</b> ${esc(d.text)}${d.linked?(d.stock>0?` <span class="pill lact">на складі ${n(d.stock)} ${esc(d.unit)}</span>`:' <span class="pill neg">немає на складі</span>'):''}</div>`};
+const tagOf=id=>{const s=byId('sows',id);return s?'№ '+s.tag:''};
+function sowEvents(id){
+  const ev=S.sowev.filter(e=>e.sow===id).map(e=>({...e,kind:e.type,col:'sowev'}));
+  S.moves.forEach(m=>{if(m.type==='birth'&&m.sow===id)ev.push({...m,kind:'farrow',col:'moves'})});
+  return ev.sort((a,b)=>(a.date||'').localeCompare(b.date||'')||(a.t||0)-(b.t||0));
+}
+function sowState(s){
+  const ev=sowEvents(s.id),last=ev[ev.length-1],st={ev,last};
+  if(s.status==='Вибракувана'){st.code='cull';st.label='Вибракувана';return st}
+  if(!last){st.code='none';st.label='Немає подій';return st}
+  st.days=ageDays(last.date)-1;
+  if(last.kind==='mate'){st.code='preg';st.exp=addDays(last.date,GEST);st.label=`Поросна · ${st.days} дн.`}
+  else if(last.kind==='farrow'){st.code='lact';st.label=`Підсисна · ${st.days} дн.`}
+  else if(last.kind==='return'){st.code='ret';st.label=`Перегул · ${st.days} дн.`}
+  else{st.code='open';st.label=`Холоста · ${st.days} дн.`}
+  return st;
+}
+function reminders(){
+  const td=today(),wk=addDays(td,7),old=addDays(td,-30),out=[];
+  const done=new Set(S.vet.filter(v=>v.plan&&v.batch).map(v=>v.batch+'__'+v.plan));S.vetskip.forEach(x=>done.add(x.batch+'__'+x.plan));
+  const P=an=>S.vetplan.filter(p=>p.anchor===an&&p.from!==''&&p.from!=null&&Number.isFinite(+p.from));
+  const span=p=>{const x=+p.from,y=(p.to===''||p.to==null||!Number.isFinite(+p.to))?x:+p.to;return[Math.min(x,y),Math.max(x,y)]};
+  const push=(p,batch,a,b,ctx)=>{if(done.has(batch+'__'+p.id))return;let st='';
+    if(b<td){if(b>=old)st='over'}else if(a<=td)st='now';else if(a<=wk)st='soon';if(st)out.push({p,batch,a,b,st,...ctx})};
+  const states={};S.sows.forEach(s=>states[s.id]=sowState(s));
+  for(const m of S.moves)if(m.type==='birth'&&m.date){
+    const sow=m.sow?byId('sows',m.sow):null,sst=sow&&states[sow.id];
+    const closed=sow&&(sst.code==='cull'||sst.last?.id!==m.id);
+    for(const p of P(A_BIRTH)){const forSow=p.target==='Свиноматки';if(forSow&&closed)continue;
+      const[x,y]=span(p);push(p,m.id,addDays(m.date,x-1),addDays(m.date,y-1),{m,sow:forSow?sow:null})}
+  }
+  for(const s of S.sows){const st=states[s.id],L=st.last;if(st.code==='cull'||!L)continue;
+    if(L.kind==='mate'){
+      for(const p of P(A_MATE)){const[x,y]=span(p);push(p,L.id,addDays(L.date,x),addDays(L.date,y),{sow:s,ev:L,exp:st.exp})}
+      for(const p of P(A_PRE)){const[x,y]=span(p);push(p,L.id,addDays(st.exp,-y),addDays(st.exp,-x),{sow:s,ev:L,exp:st.exp})}}
+    if(L.kind==='wean')for(const p of P(A_WEAN)){const[x,y]=span(p);push(p,L.id,addDays(L.date,x),addDays(L.date,y),{sow:s,ev:L})}
+  }
+  const rank={over:0,now:1,soon:2};
+  return out.sort((x,y)=>rank[x.st]-rank[y.st]||(x.st==='soon'?x.a.localeCompare(y.a):x.b.localeCompare(y.b)));
+}
+function remDesc(r){
+  const parts=[r.sow?'Свиноматка '+tagOf(r.sow.id):r.p.target];
+  if(r.m)parts.push(`опорос ${fmtD(r.m.date)}${r.m.sow&&!r.sow?' ('+tagOf(r.m.sow)+')':''}, ${gname(r.m.to)}`,`${mf.format(+r.m.count||0)} гол. · ${ageDays(r.m.date)} доба`);
+  else if(r.ev?.kind==='mate')parts.push(`осіменіння ${fmtD(r.ev.date)} · опорос ≈ ${fmtD(r.exp)}`);
+  else if(r.ev?.kind==='wean')parts.push(`відлучення ${fmtD(r.ev.date)}`);
+  return parts.join(' · ');
+}
+function planDays(p){if(p.anchor===A_NONE||p.from==null||p.from==='')return '';const t=p.to!==''&&p.to!=null&&+p.to!==+p.from?'–'+p.to:'';
+  return p.anchor===A_BIRTH?`${p.from}${t} доба`:p.anchor===A_PRE?`за ${p.from}${t} дн. до опоросу`:`${p.from}${t} день`}
+function remAction(r){const a=r.p.action||ACT_VET;if((a===ACT_MATE||a===ACT_FARROW||a===ACT_WEAN)&&!r.sow)return ACT_DONE;return a}
+function remSheet(bid,pid){
+  const r=reminders().find(x=>x.batch===bid&&x.p.id===pid);if(!r)return;const{p,a,b}=r;const it=byId('items',p.item);
+  const act=remAction(r);const lab={[ACT_VET]:'Внести обробку',[ACT_DONE]:'Виконано',[ACT_MATE]:'Внести осіменіння',[ACT_FARROW]:'Внести опорос',[ACT_WEAN]:'Внести відлучення'}[act];
+  sheet(`<h3>${esc(p.name)}</h3><dl class="kv">
+   <dt>Кому</dt><dd>${esc(r.sow?'Свиноматка '+tagOf(r.sow.id):p.target)}</dd>
+   <dt>Від чого</dt><dd>${esc(remDesc(r).split(' · ').slice(1).join(' · '))}</dd>
+   <dt>Строк</dt><dd class="num">${fmtD(a)}${a!==b?'–'+fmtD(b):''} (${esc(planDays(p))})</dd>
+   ${(()=>{const d=planDrug(p);return d?`<dt>Препарат</dt><dd><b>${esc(d.text)}</b>${d.linked?`<br><span class="num" style="color:${d.stock>0?'var(--good)':'var(--bad)'}">${d.stock>0?'на складі '+n(d.stock)+' '+esc(d.unit):'немає на складі'}</span>`:''}</dd>`:''})()}${p.what?`<dt>Як</dt><dd>${esc(p.what)}</dd>`:''}</dl>
+   ${act===ACT_VET?(()=>{const sc=stockCalc();const its=S.items.filter(i=>i.cat==='Ветпрепарат'||i.cat==='Інше'||i.id===p.item).sort((x,y)=>(y.cat==='Ветпрепарат')-(x.cat==='Ветпрепарат')||String(x.name).localeCompare(String(y.name),'uk'));
+     return `<label class="f" for="remitem" style="margin-top:12px">Чим робимо (зі складу)<select id="remitem"><option value="">— без препарату зі складу —</option>${its.map(i=>`<option value="${esc(i.id)}"${i.id===p.item?' selected':''}>${esc(i.name)} — ${n(sc[i.id]?.bal||0)} ${esc(i.unit)}</option>`).join('')}</select></label>
+     <label style="display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted);margin-top:8px"><input type="checkbox" id="remkeep" checked> Запам'ятати цей препарат для пункту схеми</label>`})():''}
+   <div class="btns"><button class="btn" data-a="remskip" data-b="${esc(bid)}" data-p="${esc(pid)}">Не потрібно</button><button class="btn primary" data-a="remdo" data-b="${esc(bid)}" data-p="${esc(pid)}">${lab}</button></div>${p.anchor===A_MATE&&r.sow?`<div class="btns"><button class="btn danger" data-a="sowev" data-k="return" data-id="${esc(r.sow.id)}">Був перегул</button></div>`:''}`);
+}
+const EV_LBL={mate:'Осіменіння',farrow:'Опорос',wean:'Відлучення',return:'Перегул'};
+function sowSheet(id){
+  const s=byId('sows',id);if(!s)return;const st=sowState(s);const rs=reminders().filter(r=>r.sow?.id===id);
+  const far=st.ev.filter(e=>e.kind==='farrow');const rets=st.ev.filter(e=>e.kind==='return').length;const avg=far.length?far.reduce((a,e)=>a+(+e.count||0),0)/far.length:0;
+  const hist=[...st.ev.map(e=>({date:e.date,t:e.t,html:`<button class="li" data-a="edit" data-c="${e.col}" data-id="${esc(e.id)}">${dateCell(e.date)}<div class="main"><div class="t">${EV_LBL[e.kind]}</div><div class="s">${esc([e.kind==='farrow'?`живих ${e.count||0}${e.dead?', мертвонар. '+e.dead:''}`:'',e.kind==='wean'&&e.count?'відлучено '+e.count:'',e.kind==='mate'?boarName(e):'',e.note].filter(Boolean).join(' · '))}</div></div></button>`})),
+    ...S.vet.filter(v=>v.sow===id).map(v=>({date:v.date,t:v.t,html:`<button class="li" data-a="edit" data-c="vet" data-id="${esc(v.id)}">${dateCell(v.date)}<div class="main"><div class="t"><span class="tag">${esc(v.kind)}</span> ${esc(v.note||'')}</div></div></button>`})),
+    ...S.vetskip.filter(x=>x.done&&x.sow===id).map(x=>({date:x.date,t:x.t,html:`<div class="li">${dateCell(x.date)}<div class="main"><div class="t">✓ ${esc(byId('vetplan',x.plan)?.name||'')}</div></div></div>`}))]
+    .sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.t||0)-(a.t||0));
+  sheet(`<h3>Свиноматка ${esc(tagOf(id))}</h3>
+   <div class="stat" style="margin-bottom:12px"><span class="pill ${st.code}">${esc(st.label)}</span>${st.exp?`<span class="pill soon">опорос ≈ ${fmtD(st.exp)}</span>`:''}</div>
+   <dl class="kv num"><dt>Опоросів</dt><dd>${far.length}</dd>${rets?`<dt>Перегулів</dt><dd style="color:var(--bad)">${rets}</dd>`:''}${far.length?`<dt>Сер. живих у гнізді</dt><dd>${nf.format(avg)}</dd>`:''}${s.born?`<dt>Народилась</dt><dd>${fmtD(s.born)}.${s.born.slice(0,4)}</dd>`:''}${s.group?`<dt>Група</dt><dd>${esc(gname(s.group))}</dd>`:''}</dl>
+   ${rs.length?`<h4>Найближче за схемою</h4><div class="list">${rs.map(r=>`<button class="li" data-a="rem" data-b="${esc(r.batch)}" data-p="${esc(r.p.id)}"><div class="main"><div class="t">${esc(r.p.name)}</div></div><div class="v">${remPill(r)}</div></button>`).join('')}</div>`:''}
+   ${st.code!=='cull'?`<h4>Записати</h4><div class="btns wrap"><button class="btn" data-a="sowev" data-k="mate" data-id="${esc(id)}">Осіменіння</button><button class="btn" data-a="sowev" data-k="birth" data-id="${esc(id)}">Опорос</button><button class="btn" data-a="sowev" data-k="wean" data-id="${esc(id)}">Відлучення</button><button class="btn danger" data-a="sowev" data-k="return" data-id="${esc(id)}">Перегул</button></div>`:''}
+   <h4>Історія</h4>${hist.length?`<div class="list">${hist.map(h=>h.html).join('')}</div>`:'<p class="empty">Ще немає подій</p>'}
+   <div class="btns"><button class="btn" data-a="edit" data-c="sows" data-id="${esc(id)}">Редагувати картку</button></div>`);
+}
+const remPill=r=>r.st==='over'?`<span class="pill neg">до ${fmtD(r.b)}</span>`:r.st==='now'?`<span class="pill due">до ${fmtD(r.b)}</span>`:`<span class="pill soon">з ${fmtD(r.a)}</span>`;
+async function clearDemo(){let k=0;for(const c of COLS)for(const d of S[c].filter(x=>x.demo)){await del(c,d.id);k++}toast('Видалено прикладів: '+k)}
+
+/* ---------- calculations ---------- */
+function heads(upTo){
+  const h={};S.groups.forEach(g=>h[g.id]=0);
+  const add=(g,v)=>{if(g in h)h[g]+=v};
+  for(const m of S.moves){if(upTo&&m.date>upTo)continue;const c=+m.count||0;
+    if(m.type==='start'||m.type==='birth'||m.type==='buy')add(m.to,c);
+    else if(m.type==='transfer'){add(m.from,-c);add(m.to,c)}
+    else add(m.from,-c)}
+  return h;
+}
+function stockCalc(){
+  const m={};S.items.forEach(i=>m[i.id]={inQ:0,inS:0,outQ:0});
+  for(const o of S.stock){const x=m[o.item];if(!x)continue;
+    if(o.kind==='in'){const v=(+o.qty||0)*(+o.price||0);x.inQ+=+o.qty||0;x.inS+=v;if(o.exp===EXP_NOW)x.inSx=(x.inSx||0)+v}else x.outQ+=+o.qty||0}
+  for(const v of S.vet)if(v.item&&m[v.item])m[v.item].outQ+=+v.qty||0;
+  for(const e of S.sowev)if(e.type==='mate'&&e.semen&&m[e.semen])m[e.semen].outQ+=+(e.doses??1)||0;
+  for(const k in m){const x=m[k];x.avg=x.inQ?x.inS/x.inQ:0}
+  for(const k in m){const x=m[k];x.avgX=x.inQ?(x.inSx||0)/x.inQ:0}
+  for(const p of S.prod){let cost=0,cx=0;for(const c of p.parts||[]){const x=m[c.item];if(!x)continue;x.outQ+=+c.qty||0;cost+=(+c.qty||0)*x.avg;cx+=(+c.qty||0)*x.avgX}
+    const y=m[p.out];if(y){y.inQ+=+p.outQty||0;y.inS+=cost;y.inSx=(y.inSx||0)+cx}}
+  for(const k in m){const x=m[k];x.bal=x.inQ-x.outQ;x.avg=x.inQ?x.inS/x.inQ:0;x.useAvg=x.inQ?(x.inS-(x.inSx||0))/x.inQ:0}
+  return m;
+}
+function prodCost(p,sc){sc=sc||stockCalc();return (p.parts||[]).reduce((a,c)=>a+(+c.qty||0)*(sc[c.item]?.avg||0),0)}
+function monthStats(){
+  const sc=stockCalc();const prevEnd=month+'-00';
+  const h0=heads(prevEnd);const start=Object.values(h0).reduce((a,b)=>a+b,0);
+  const r={born:0,dead:0,stillborn:0,litters:0,bought:0,sold:0,soldKg:0,revenue:0,mat:{Корм:0,Ветпрепарат:0,Сперма:0,Інше:0},costs:{},pay:0};
+  for(const m of S.moves)if(inMonth(m.date)){const c=+m.count||0;
+    if(m.type==='birth'){r.born+=c;r.stillborn+=+m.dead||0;r.litters+=+m.litters||0}
+    if(m.type==='buy')r.bought+=c;if(m.type==='start')r.started=(r.started||0)+c;
+    if(m.type==='death')r.dead+=c;
+    if(m.type==='sale'){r.sold+=c;r.soldKg+=+m.weight||0;r.revenue+=+m.sum||0}}
+  const matAdd=(item,q)=>{const it=byId('items',item);if(!it)return;const k=isFeed(it.cat)?'Корм':it.cat==='Ветпрепарат'||it.cat==='Сперма'?it.cat:'Інше';r.mat[k]+=q*(sc[item]?.useAvg||0)};
+  for(const e of S.sowev)if(e.type==='mate'&&e.semen&&inMonth(e.date))matAdd(e.semen,+(e.doses??1)||0);
+  for(const o of S.stock)if(o.kind==='in'&&o.exp===EXP_NOW&&inMonth(o.date)){const it=byId('items',o.item);const k=isFeed(it?.cat)?'Корм':it?.cat==='Ветпрепарат'||it?.cat==='Сперма'?it.cat:'Інше';r.mat[k]+=(+o.qty||0)*(+o.price||0)}
+  for(const o of S.stock)if(o.kind==='out'&&inMonth(o.date))matAdd(o.item,+o.qty||0);
+  for(const v of S.vet)if(v.item&&inMonth(v.date))matAdd(v.item,+v.qty||0);
+  for(const c of S.costs)if(inMonth(c.date))r.costs[c.cat]=(r.costs[c.cat]||0)+(+c.sum||0);
+  for(const p of S.pay)if(inMonth(p.date))r.pay+=+p.sum||0;
+  const base=start+(r.started||0)+r.born+r.bought;r.mort=base?r.dead/base*100:0;
+  r.totalCost=Object.values(r.mat).reduce((a,b)=>a+b,0)+Object.values(r.costs).reduce((a,b)=>a+b,0)+r.pay;
+  return r;
+}
+
+/* ---------- rendering ---------- */
+let pending=false;
+function schedule(){if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;render()})}
+const TITLES={home:'Свиноферма',herd:'Поголів\'я',stock:'Склад',vet:'Ветеринарія',money:'Гроші'};
+function monthBar(){const[y,m]=month.split('-').map(Number);
+  return `<div class="monthbar"><button data-a="mprev" aria-label="Попередній місяць">‹</button><b>${MON[m-1]} ${y}</b><button data-a="mnext" aria-label="Наступний місяць">›</button></div>`}
+function dateCell(d){if(!d)return '<div class="date">—</div>';const[,m,dd]=d.split('-');return `<div class="date"><b>${+dd}</b>${MONS[+m-1]}</div>`}
+function render(){
+  document.getElementById('ttl').textContent=TITLES[tab];
+  document.querySelectorAll('nav.tabs button').forEach(b=>{if(b.dataset.tab===tab)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
+  const vb=document.getElementById('vbadge');if(vb){const o=mode==='loading'?0:reminders().filter(r=>r.st==='over'||r.st==='now').length;vb.textContent=o;vb.hidden=!o}
+  const app=document.getElementById('app');
+  const auth=mode==='login'||mode==='noconfig';document.querySelector('.fab').hidden=auth||mode==='loading';document.querySelector('nav.tabs').hidden=auth;document.querySelector('header.top [data-a=settings]').hidden=auth;
+  if(mode==='noconfig'){app.innerHTML=`<section><div class="card"><h2>Налаштування не завершено</h2><p>У файлі firebase-config.js ще немає даних вашого проєкту Firebase.</p></div></section>`;return}
+  if(mode==='login'){app.innerHTML=loginView();return}
+  if(mode==='loading'){app.innerHTML='<p class="empty">Завантаження даних…</p>';return}
+  let top='';
+  const anyDemo=COLS.some(c=>S[c].some(x=>x.demo));
+  if(anyDemo)top+=`<div class="demo-note"><span>Зараз показано приклад даних.</span><button class="linkbtn" data-a="cleardemo">Видалити приклад</button></div>`;
+  const isEmpty=!S.groups.length&&!S.items.length;
+  if(isEmpty){app.innerHTML=`<section>${top}<div class="card"><h2>Почніть облік</h2>
+   <p>Додайте групи тварин (свиноматки, дорощування, відгодівля…) і внесіть початкове поголів'я. Далі — корми на склад, щоденні списання, опороси, падіж, продаж.</p>
+   <div class="btns"><button class="btn primary" data-a="form" data-k="group">Додати групу</button><button class="btn" data-a="import">Імпорт даних з файлу</button></div></div></section>`;return}
+  app.innerHTML='<section>'+top+({home:vHome,herd:vHerd,stock:vStock,vet:vVet,money:vMoney}[tab])()+'</section>';
+}
+function vHome(){
+  const h=heads();const tot=Object.values(h).reduce((a,b)=>a+b,0);
+  const byCat={};S.groups.forEach(g=>byCat[g.cat]=(byCat[g.cat]||0)+(h[g.id]||0));
+  const r=monthStats();const sc=stockCalc();
+  const alerts=S.items.filter(i=>sc[i.id].bal<=0||(i.min&&sc[i.id].bal<+i.min));
+  const rows=expRows(r);const _old=[['Корми',r.mat.Корм],['Ветпрепарати',r.mat.Ветпрепарат],['Сперма для осіменіння',r.mat.Сперма],['Інші матеріали',r.mat.Інше],...Object.entries(r.costs),['Зарплата',r.pay]].filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]);
+  const mx=Math.max(1,...rows.map(x=>x[1]));
+  return `<div class="card hero"><div class="big num">${mf.format(tot)}</div><div class="lbl">голів на фермі зараз</div>
+   <div class="chips">${GROUP_CATS.filter(c=>byCat[c]).map(c=>`<span class="chip">${c} <b class="num">${mf.format(byCat[c])}</b></span>`).join('')}</div></div>
+   ${monthBar()}
+   <div class="card"><h2>Рух поголів'я за місяць</h2><dl class="kv num">
+    <dt>Народжено живих</dt><dd>${mf.format(r.born)}${r.litters?` <span class="s" style="color:var(--muted);font-weight:400">· ${r.litters} опорос.</span>`:''}</dd>
+    ${r.stillborn?`<dt>Мертвонароджених</dt><dd>${mf.format(r.stillborn)}</dd>`:''}
+    ${r.bought?`<dt>Куплено</dt><dd>${mf.format(r.bought)}</dd>`:''}
+    <dt>Падіж</dt><dd style="color:${r.dead?'var(--bad)':'inherit'}">${mf.format(r.dead)} гол. · ${nf.format(r.mort)}%</dd>
+    <dt>Продано</dt><dd>${mf.format(r.sold)} гол. · ${n(r.soldKg)} кг</dd>
+    <dt>Виручка</dt><dd>${money(r.revenue)}</dd></dl></div>
+   <div class="card"><h2>Витрати за місяць</h2>${rows.length?`<div class="bars">${rows.map(([k,v])=>`<div class="bar"><div class="row"><span>${esc(k)}</span><span class="num">${money(v)}</span></div><div class="track"><div class="fill" style="width:${(v/mx*100).toFixed(1)}%"></div></div></div>`).join('')}</div>
+   <div class="total num"><span>Разом</span><span>${money(r.totalCost)}</span></div>
+   ${r.soldKg?`<p class="hint" style="margin:8px 0 0">Витрати на 1 кг реалізованої живої ваги: <b class="num">${nf.format(r.totalCost/r.soldKg)} ₴</b> (орієнтовно, без зміни незавершеного виробництва)</p>`:''}`:'<p class="empty">У цьому місяці витрат ще немає</p>'}</div>
+   ${S.vetplan.length?(()=>{const rs=reminders();const o=rs.filter(r=>r.st==='over').length,nw=rs.filter(r=>r.st==='now').length,sn=rs.filter(r=>r.st==='soon').length;
+    return `<button class="card li" style="border:1px solid var(--line);padding:14px 16px" data-a="gorem"><div class="main"><h2 style="margin:0 0 4px">Ветеринарія за схемою</h2><div>${o?`<span class="pill neg">${o} прострочено</span> `:''}${nw?`<span class="pill due">${nw} зараз</span> `:''}${sn?`<span class="pill soon">${sn} цього тижня</span>`:''}${!o&&!nw&&!sn?'<span class="s">Найближчим тижнем обробок немає</span>':''}</div></div><div class="v">›</div></button>`})():''}
+   ${(()=>{const t=debts().reduce((a,d)=>a+Math.max(0,d.debt),0);return t>0.5?`<button class="card li" style="border:1px solid var(--line);padding:14px 16px" data-a="godebt"><div class="main"><h2 style="margin:0 0 4px">Борги постачальникам</h2><div class="num" style="font-weight:700;color:var(--bad)">${money(t)}</div></div><div class="v">›</div></button>`:''})()}
+   <div class="card"><h2>Склад — потребує уваги</h2>${alerts.length?`<div class="list">${alerts.map(i=>{const b=sc[i.id].bal;return `<div class="li"><div class="main"><div class="t">${esc(i.name)}</div></div><div class="v num">${n(b)} ${esc(i.unit)} <span class="pill ${b<=0?'neg':'low'}">${b<=0?'немає':'мало'}</span></div></div>`}).join('')}</div>`:'<p class="empty">Усі залишки в нормі</p>'}</div>`;
+}
+const MOVE_LBL={start:['Початок','plus'],birth:['Опорос','plus'],buy:['Купівля','plus'],transfer:['Переведення','move'],death:['Падіж','minus'],sale:['Продаж','minus']};
+function moveRow(m){const[l,c]=MOVE_LBL[m.type]||['?',''];
+  let s='';if(m.type==='transfer')s=gname(m.from)+' → '+gname(m.to);else if(m.to&&m.type!=='death'&&m.type!=='sale')s=gname(m.to);else s=gname(m.from);
+  let extra=[];if(m.type==='birth'&&m.dead)extra.push('мертвонар. '+m.dead);if(m.weight)extra.push(n(m.weight)+' кг');if(m.reason)extra.push(m.reason);if(m.note)extra.push(m.note);
+  const sign=c==='plus'?'+':c==='minus'?'−':'';
+  return `<button class="li" data-a="edit" data-c="moves" data-id="${esc(m.id)}">${dateCell(m.date)}<div class="main"><div class="t"><span class="tag ${c}">${l}</span> ${esc(s)}</div>${extra.length?`<div class="s">${esc(extra.join(' · '))}</div>`:''}</div><div class="v num">${sign}${mf.format(+m.count||0)}<small>${m.sum?money(m.sum):'гол.'}</small></div></button>`}
+const STAGES={sows:{cats:['Свиноматки','Кнури','Ремонтні свинки']},suck:{cats:['Поросята-сисуни']},grow:{cats:['Дорощування'],lbl:'голів на дорощуванні'},fat:{cats:['Відгодівля'],lbl:'голів на відгодівлі'}};
+function vHerd(){
+  if(!STAGES[herdView])herdView='sows';
+  const seg=`<div class="seg" role="group">${[['sows','Свиноматки'],['suck','Сисуни'],['grow','Дорощування'],['fat','Відгодівля']].map(([v,l])=>`<button data-a="hv" data-v="${v}" aria-pressed="${herdView===v}">${l}</button>`).join('')}</div>`;
+  const cats=STAGES[herdView].cats;
+  if(herdView==='sows')return seg+vSows()+groupsCard(cats,'Групи маточного стада')+journalCard(cats);
+  if(herdView==='suck')return seg+vPiglets()+groupsCard(cats,'Групи')+journalCard(cats);
+  return seg+vStage(herdView);
+}
+const groupIds=cats=>S.groups.filter(g=>cats.includes(g.cat)).map(g=>g.id);
+function groupsCard(cats,title){
+  const h=heads();const gs=S.groups.filter(g=>cats.includes(g.cat)).sort((a,b)=>cats.indexOf(a.cat)-cats.indexOf(b.cat)||(a.t||0)-(b.t||0));
+  return `<div class="card"><h2>${title}</h2>${gs.length?`<div class="list">${gs.map(g=>`<button class="li" data-a="edit" data-c="groups" data-id="${esc(g.id)}"><div class="main"><div class="t">${esc(g.name)}</div><div class="s">${esc(g.cat)}${g.place?' · '+esc(g.place):''}</div></div><div class="v num">${mf.format(h[g.id]||0)}<small>гол.</small></div></button>`).join('')}</div>`:'<p class="empty">Груп ще немає</p>'}
+   <button class="linkbtn" data-a="addgroup" data-cat="${esc(cats[0])}">+ Додати групу</button></div>`;
+}
+function journalCard(cats){
+  const set=new Set(groupIds(cats));const j=sortJ(S.moves.filter(m=>set.has(m.from)||set.has(m.to)));
+  return `<div class="card"><h2>Журнал руху</h2>${j.length?`<div class="list">${j.slice(0,herdShow).map(moveRow).join('')}</div>${j.length>herdShow?'<button class="linkbtn" data-a="more">Показати ще</button>':''}`:'<p class="empty">Ще немає записів</p>'}</div>`;
+}
+function stageStats(ids){
+  const set=new Set(ids),sc=stockCalc();
+  const cur=month===today().slice(0,7);const[y,mm]=month.split('-').map(Number);const dim=new Date(y,mm,0).getDate();
+  const days=cur?+today().slice(8,10):dim;const end=cur?today():month+'-'+String(dim).padStart(2,'0');
+  const sum=h=>ids.reduce((a,id)=>a+(h[id]||0),0);
+  const r={start:sum(heads(month+'-00')),end:sum(heads(end)),in:0,inKg:0,inW:0,out:0,outKg:0,outW:0,dead:0,sold:0,soldKg:0,rev:0,feedKg:0,feedCost:0,days};
+  for(const m of S.moves)if(inMonth(m.date)){const c=+m.count||0,fi=set.has(m.from),ti=set.has(m.to),w=+m.weight||0;
+    if(m.type==='start'&&ti)r.start+=c;
+    else if(m.type==='transfer'){if(ti&&!fi){r.in+=c;if(w){r.inKg+=w;r.inW+=c}}if(fi&&!ti){r.out+=c;if(w){r.outKg+=w;r.outW+=c}}}
+    else if((m.type==='birth'||m.type==='buy')&&ti)r.in+=c;
+    else if(m.type==='death'&&fi)r.dead+=c;
+    else if(m.type==='sale'&&fi){r.sold+=c;r.soldKg+=+m.weight||0;r.rev+=+m.sum||0}}
+  for(const o of S.stock)if(o.kind==='out'&&inMonth(o.date)&&set.has(o.group)){const it=byId('items',o.item);if(!isFeed(it?.cat))continue;
+    const q=+o.qty||0;r.feedKg+=it.unit==='т'?q*1000:q;r.feedCost+=q*(sc[o.item]?.useAvg||0)}
+  const avgH=(r.start+r.end)/2;r.perHead=avgH&&days?r.feedKg/avgH/days:0;r.mort=(r.start+r.in)?r.dead/(r.start+r.in)*100:0;
+  return r;
+}
+function vStage(key){
+  const cats=STAGES[key].cats,ids=groupIds(cats),h=heads(),now=ids.reduce((a,id)=>a+(h[id]||0),0);const r=stageStats(ids);
+  const avgw=(kg,n)=>n?nf.format(kg/n)+' кг/гол.':'';
+  return `<div class="card hero"><div class="big num">${mf.format(now)}</div><div class="lbl">${STAGES[key].lbl} зараз</div>
+   <div class="chips">${S.groups.filter(g=>cats.includes(g.cat)).map(g=>`<span class="chip">${esc(g.name)} <b class="num">${mf.format(h[g.id]||0)}</b></span>`).join('')}</div></div>
+   ${monthBar()}
+   <div class="card"><h2>Рух за місяць</h2><dl class="kv num">
+    <dt>На початок місяця</dt><dd>${mf.format(r.start)}</dd>
+    <dt>Надійшло</dt><dd>+${mf.format(r.in)}${r.inW?` <span style="color:var(--muted);font-weight:400">· ${avgw(r.inKg,r.inW)}</span>`:''}</dd>
+    ${r.out||key==='grow'?`<dt>Переведено на відгодівлю</dt><dd>−${mf.format(r.out)}${r.outW?` <span style="color:var(--muted);font-weight:400">· ${avgw(r.outKg,r.outW)}</span>`:''}</dd>`:''}
+    ${r.sold||key==='fat'?`<dt>Продано</dt><dd>−${mf.format(r.sold)}${r.soldKg?` · ${n(r.soldKg)} кг`:''}</dd>${r.soldKg?`<dt>Сер. жива вага продажу</dt><dd>${avgw(r.soldKg,r.sold)}</dd><dt>Виручка</dt><dd>${money(r.rev)}</dd>`:''}`:''}
+    <dt>Падіж</dt><dd style="color:${r.dead?'var(--bad)':'inherit'}">${mf.format(r.dead)} гол. · ${nf.format(r.mort)}%</dd>
+    <dt>На кінець періоду</dt><dd>${mf.format(r.end)}</dd></dl></div>
+   <div class="card"><h2>Корми за місяць</h2>${r.feedKg?`<dl class="kv num"><dt>Згодовано</dt><dd>${n(r.feedKg)} кг</dd><dt>Вартість</dt><dd>${money(r.feedCost)}</dd>${r.perHead?`<dt>На голову на добу</dt><dd>${nf.format(r.perHead)} кг</dd>`:''}</dl><p class="hint" style="margin:8px 0 0">На голову — від середнього поголів'я за ${r.days} дн.</p>`:'<p class="empty">Списань корму на ці групи в цьому місяці немає</p>'}</div>
+   ${groupsCard(cats,'Групи')}${journalCard(cats)}`;
+}
+function vStock(){
+  const sc=stockCalc();const items=S.items.slice().sort((a,b)=>ITEM_CATS.indexOf(a.cat)-ITEM_CATS.indexOf(b.cat)||(a.t||0)-(b.t||0));
+  let value=0;items.forEach(i=>value+=Math.max(0,sc[i.id].bal)*sc[i.id].avg);
+  const ops=sortJ([...S.stock,...S.prod.map(p=>({...p,kind:'prod'}))]).slice(0,60);
+  const prodRow=o=>{const it=byId('items',o.out);const c=prodCost(o,sc);
+    return `<button class="li" data-a="prod" data-id="${esc(o.id)}">${dateCell(o.date)}<div class="main"><div class="t"><span class="tag move">Виготовлення</span> ${esc(it?.name||'—')}</div><div class="s">${esc((o.parts||[]).map(c=>{const x=byId('items',c.item);return (x?.name||'—')+' '+n(c.qty)+' '+(x?.unit||'')}).join(', '))}${o.outQty?' · собів. '+nf.format(c/o.outQty)+' ₴/'+esc(it?.unit||''):''}</div></div><div class="v num">+${n(o.outQty)}<small>${esc(it?.unit||'')}</small></div></button>`};
+  return `<div class="btns"><button class="btn primary" data-a="prod">Виготовити корм</button><button class="btn" data-a="form" data-k="feed">Списати на групу</button></div>
+  <div class="card"><h2>Залишки · вартість ${money(value)}</h2><div class="list">${items.map(i=>{const x=sc[i.id];const st=x.bal<=0?'<span class="pill neg">немає</span>':(i.min&&x.bal<+i.min?'<span class="pill low">мало</span>':'');
+   return `<button class="li" data-a="edit" data-c="items" data-id="${esc(i.id)}"><div class="main"><div class="t">${esc(i.name)}</div><div class="s">${esc(i.cat==='Готовий корм'?'Готовий корм':i.cat)} · ${byId&&S.prod.some(p=>p.out===i.id)?'собівартість':'сер. ціна'} ${nf.format(x.avg)} ₴/${esc(i.unit)}</div></div><div class="v num">${n(x.bal)} ${esc(i.unit)} ${st}<small>${money(Math.max(0,x.bal)*x.avg)}</small></div></button>`}).join('')||'<p class="empty">Додайте корми й препарати в Довідниках</p>'}</div></div>
+  <div class="card"><h2>Прихід, виготовлення, списання</h2>${ops.length?`<div class="list">${ops.map(o=>{if(o.kind==='prod')return prodRow(o);const it=byId('items',o.item);const inn=o.kind==='in';
+   return `<button class="li" data-a="edit" data-c="stock" data-id="${esc(o.id)}">${dateCell(o.date)}<div class="main"><div class="t"><span class="tag ${inn?'plus':'minus'}">${inn?'Прихід':'Списання'}</span> ${esc(it?.name||'—')}</div><div class="s">${esc(inn?[o.supplier,o.price?nf.format(o.price)+' ₴/'+(it?.unit||''):'',o.exp===EXP_NOW?'у витратах '+money((+o.qty||0)*(+o.price||0)):''].filter(Boolean).join(' · '):[gname(o.group),o.note].filter(Boolean).join(' · '))}</div></div><div class="v num">${inn?'+':'−'}${n(o.qty)}<small>${esc(it?.unit||'')}</small></div></button>`}).join('')}</div>`:'<p class="empty">Ще немає операцій</p>'}</div>`;
+}
+const boarName=e=>[byId('items',e.semen)?.name,e.boar].filter(Boolean).join(' · ');
+function mateOutcome(e){const ev=sowEvents(e.sow);const i=ev.findIndex(x=>x.id===e.id&&x.kind==='mate');const nx=ev[i+1];
+  if(!nx)return{st:'wait'};if(nx.kind==='farrow')return{st:'ok',live:+nx.count||0,date:nx.date};if(nx.kind==='return')return{st:'ret',date:nx.date};return{st:'unk'}}
+function semenStats(id){const ms=S.sowev.filter(e=>e.type==='mate'&&e.semen===id).map(e=>({e,o:mateOutcome(e)}));
+  const ok=ms.filter(x=>x.o.st==='ok'),ret=ms.filter(x=>x.o.st==='ret');const done=ok.length+ret.length;
+  return{ms,ok:ok.length,ret:ret.length,wait:ms.filter(x=>x.o.st==='wait').length,rate:done?ok.length/done*100:null,avg:ok.length?ok.reduce((a,x)=>a+x.o.live,0)/ok.length:null}}
+function semenCard(){
+  const sc=stockCalc();const its=S.items.filter(i=>i.cat==='Сперма').sort((a,b)=>(a.t||0)-(b.t||0));
+  return `<div class="card"><h2>Сперма кабанів</h2>${its.length?`<div class="list">${its.map(x=>{const st=semenStats(x.id);const b=sc[x.id]?.bal||0;
+   return `<button class="li" data-a="semen" data-id="${esc(x.id)}"><div class="main"><div class="t">${esc(x.name)} <span class="pill ${b>0?'lact':'neg'}">${b>0?'на складі '+n(b)+' '+esc(x.unit):'немає доз'}</span></div><div class="s">${esc([`осіменінь ${st.ms.length}`,st.wait?`чекаємо ${st.wait}`:'',st.avg!=null?`сер. ${nf.format(st.avg)} живих`:''].filter(Boolean).join(' · '))}</div></div><div class="v num">${st.rate!=null?nf.format(st.rate)+'%':'—'}<small>заплідн.</small></div></button>`}).join('')}</div>`:'<p class="empty">Додайте сперму як матеріал з типом «Сперма» й одиницею «доза»</p>'}
+   <div class="btns" style="margin-top:8px"><button class="btn" data-a="semnew">+ Нова лінія</button>${its.length?'<button class="btn primary" data-a="semin">Прихід доз</button>':''}</div></div>`;
+}
+function semenSheet(id){const x=byId('items',id);if(!x)return;const st=semenStats(id);const sc=stockCalc();
+  const lbl={ok:o=>`<span class="pill lact">опорос · ${o.live} живих</span>`,ret:()=>'<span class="pill ret">перегул</span>',wait:()=>'<span class="pill preg">чекаємо</span>',unk:()=>'<span class="pill none">—</span>'};
+  sheet(`<h3>${esc(x.name)}</h3><dl class="kv num"><dt>На складі</dt><dd>${n(sc[id]?.bal||0)} ${esc(x.unit)}</dd><dt>Ціна дози</dt><dd>${nf.format(sc[id]?.avg||0)} ₴</dd><dt>Осіменінь</dt><dd>${st.ms.length}</dd><dt>Опоросів</dt><dd>${st.ok}</dd><dt>Перегулів</dt><dd>${st.ret}</dd><dt>Ще чекаємо</dt><dd>${st.wait}</dd><dt>Заплідненість</dt><dd>${st.rate!=null?nf.format(st.rate)+'%':'—'}</dd>${st.avg!=null?`<dt>Сер. живих у гнізді</dt><dd>${nf.format(st.avg)}</dd>`:''}</dl>
+   <p class="hint" style="margin:8px 0 0">Заплідненість — частка опоросів серед осіменінь з відомим результатом (опорос або перегул).</p>
+   <h4>Осіменіння</h4>${st.ms.length?`<div class="list">${sortJ(st.ms.map(m=>({...m,date:m.e.date,t:m.e.t}))).map(m=>`<button class="li" data-a="sow" data-id="${esc(m.e.sow)}">${dateCell(m.e.date)}<div class="main"><div class="t">Свиноматка ${esc(tagOf(m.e.sow))}</div></div><div class="v">${lbl[m.o.st](m.o)}</div></button>`).join('')}</div>`:'<p class="empty">Ще немає</p>'}
+   <div class="btns"><button class="btn" data-a="edit" data-c="items" data-id="${esc(id)}">Редагувати</button><button class="btn primary" data-a="semin" data-id="${esc(id)}">Прихід доз</button></div>`)}
+function vSows(){
+  const states=S.sows.map(s=>({s,st:sowState(s)}));const rs=reminders();
+  const ord={over:0,now:1,soon:2,preg:3,lact:3,open:3,none:4,cull:9};
+  const cnt=c=>states.filter(x=>x.st.code===c).length;
+  const grp=c=>c==='ret'?0:c==='preg'?1:c==='cull'?3:2;
+  const rows=states.map(x=>{const r=rs.find(r=>r.sow?.id===x.s.id);return{...x,r}})
+    .sort((a,b)=>grp(a.st.code)-grp(b.st.code)||(a.st.exp&&b.st.exp?a.st.exp.localeCompare(b.st.exp):0)||String(a.s.tag).localeCompare(String(b.s.tag),'uk',{numeric:true}));
+  const expTxt=e=>{const d=ageDays(e)-1;return 'опорос ≈ '+fmtD(e)+(d>0?` · мав бути ${d} дн. тому`:d===0?' · сьогодні':` · через ${-d} дн.`)};
+  return `<div class="card"><h2>Свиноматки · ${S.sows.filter(s=>s.status!=='Вибракувана').length} · за датою опоросу</h2>
+   ${S.sows.length?`<div class="stat" style="margin-bottom:6px"><span class="pill preg">Поросних ${cnt('preg')}</span><span class="pill lact">Підсисних ${cnt('lact')}</span><span class="pill open">Холостих ${cnt('open')}</span>${cnt('ret')?`<span class="pill ret">Перегул ${cnt('ret')}</span>`:''}</div>
+   <div class="list">${rows.map(({s,st,r})=>`<button class="li" data-a="sow" data-id="${esc(s.id)}"><div class="main"><div class="t">№ ${esc(s.tag)} <span class="pill ${st.code}">${esc(st.label)}</span></div><div class="s">${esc([st.exp?expTxt(st.exp):'',r?r.p.name:''].filter(Boolean).join(' · '))}</div></div><div class="v">${r?remPill(r):''}</div></button>`).join('')}</div>`
+   :'<p style="margin:0">Внесіть свиноматок поіменно — і застосунок сам рахуватиме очікуваний опорос (осіменіння + 114 днів), обробки перед опоросом, відлучення й наступне осіменіння.</p>'}</div>
+   ${semenCard()}
+   <div class="btns"><button class="btn" data-a="form" data-k="sow">Додати свиноматку</button>${S.sows.length?'<button class="btn primary" data-a="form" data-k="mate">Осіменіння</button>':''}</div>`;
+}
+function litterInfo(m){
+  const age=ageDays(m.date);const sow=m.sow?byId('sows',m.sow):null;
+  const wean=sow?S.sowev.find(e=>e.type==='wean'&&e.sow===sow.id&&e.date>=m.date):null;
+  const weaned=wean||age>28;
+  const plan=S.vetplan.filter(p=>p.anchor===A_BIRTH&&p.target!=='Свиноматки'&&p.from!==''&&p.from!=null).sort((a,b)=>+a.from-+b.from);
+  const td=today();
+  const items=plan.map(p=>{const x=+p.from,y=(p.to===''||p.to==null)?x:Math.max(x,+p.to);const a=addDays(m.date,x-1),b=addDays(m.date,y-1);
+    const v=S.vet.find(v=>v.plan===p.id&&v.batch===m.id),sk=S.vetskip.find(k=>k.plan===p.id&&k.batch===m.id);
+    const st=v?'done':sk?(sk.done?'done':'skip'):b<td?'over':a<=td?'now':'later';return{p,a,b,st,v}});
+  const next=items.find(i=>i.st==='over'||i.st==='now')||items.find(i=>i.st==='later');
+  return{age,sow,wean,weaned,items,next};
+}
+function vPiglets(){
+  const h=heads();const suck=S.groups.filter(g=>g.cat==='Поросята-сисуни').reduce((a,g)=>a+(h[g.id]||0),0);
+  const lim=addDays(today(),-120);
+  const L=sortJ(S.moves.filter(m=>m.type==='birth'&&m.date>=lim));
+  const mb=S.moves.filter(m=>m.type==='birth'&&inMonth(m.date));const lit=mb.reduce((a,m)=>a+(+m.litters||1),0),born=mb.reduce((a,m)=>a+(+m.count||0),0),dead=mb.reduce((a,m)=>a+(+m.dead||0),0);
+  return `<div class="card hero"><div class="big num">${mf.format(suck)}</div><div class="lbl">поросят-сисунів зараз</div>
+   <div class="chips"><span class="chip">Опоросів за місяць <b class="num">${lit}</b></span><span class="chip">Живих <b class="num">${born}</b></span>${lit?`<span class="chip">На гніздо <b class="num">${nf.format(born/lit)}</b></span>`:''}${dead?`<span class="chip">Мертвонар. <b class="num">${dead}</b></span>`:''}</div></div>
+   <div class="card"><h2>Гнізда за 4 місяці</h2>${L.length?`<div class="list">${L.map(m=>{const i=litterInfo(m);const nx=i.next;
+     const pill=!nx?'':nx.st==='over'?`<span class="pill neg">до ${fmtD(nx.b)}</span>`:nx.st==='now'?`<span class="pill due">до ${fmtD(nx.b)}</span>`:`<span class="pill soon">з ${fmtD(nx.a)}</span>`;
+     return `<button class="li" data-a="litter" data-id="${esc(m.id)}">${dateCell(m.date)}<div class="main"><div class="t">${esc(i.sow?'Свиноматка № '+i.sow.tag:(m.litters>1?m.litters+' опоросів':'Опорос'))} <span class="pill ${i.weaned?'soon':'lact'}">${i.weaned?'відлучені':'підсисні'}</span></div><div class="s">${i.age} доба · ${esc(gname(m.to))}${nx?' · '+esc(nx.p.name):''}</div></div><div class="v num">${mf.format(+m.count||0)}<small>${pill||'живих'}</small></div></button>`}).join('')}</div>`:'<p class="empty">Ще немає опоросів. Натисніть «+» → «Опорос».</p>'}</div>`;
+}
+function litterSheet(id){
+  const m=byId('moves',id);if(!m)return;const i=litterInfo(m);
+  const lbl={done:'✓ зроблено',skip:'не потрібно',over:'прострочено',now:'зараз',later:''};
+  const cls={done:'lact',skip:'none',over:'neg',now:'due',later:'soon'};
+  sheet(`<h3>${esc(i.sow?'Гніздо свиноматки № '+i.sow.tag:'Опорос '+fmtD(m.date))}</h3>
+   <dl class="kv num"><dt>Дата опоросу</dt><dd>${fmtD(m.date)}.${m.date.slice(0,4)}</dd><dt>Вік</dt><dd>${i.age} доба</dd><dt>Народжено живих</dt><dd>${mf.format(+m.count||0)}</dd>${m.dead?`<dt>Мертвонароджених</dt><dd>${m.dead}</dd>`:''}${m.litters>1?`<dt>Опоросів</dt><dd>${m.litters}</dd>`:''}<dt>Група</dt><dd>${esc(gname(m.to))}</dd>${i.wean?`<dt>Відлучено</dt><dd>${fmtD(i.wean.date)}${i.wean.count?' · '+i.wean.count+' гол.':''}</dd>`:''}</dl>
+   <h4>Обробки поросят за схемою</h4>${i.items.length?`<div class="list">${i.items.map(x=>{const clickable=x.st==='over'||x.st==='now'||(x.st==='later'&&x.a<=addDays(today(),7));
+     const inner=`<div class="main"><div class="t">${esc(x.p.name)}</div>${x.st==="done"||x.st==="skip"?"":drugLine(x.p)}<div class="s num">${fmtD(x.a)}${x.a!==x.b?'–'+fmtD(x.b):''} · ${esc(planDays(x.p))}</div></div><div class="v">${x.st==='later'?`<span class="pill soon">з ${fmtD(x.a)}</span>`:`<span class="pill ${cls[x.st]}">${lbl[x.st]}</span>`}</div>`;
+     return clickable?`<button class="li" data-a="rem" data-b="${esc(m.id)}" data-p="${esc(x.p.id)}">${inner}</button>`:`<div class="li">${inner}</div>`}).join('')}</div>`:'<p class="empty">Схема для поросят порожня</p>'}
+   <div class="btns"><button class="btn" data-a="edit" data-c="moves" data-id="${esc(m.id)}">Редагувати опорос</button></div>`);
+}
+function vVet(){
+  const seg=`<div class="seg" role="group">${[['rem','Нагадування'],['log','Журнал'],['plan','Схема']].map(([v,l])=>`<button data-a="vv" data-v="${v}" aria-pressed="${vetView===v}">${l}</button>`).join('')}</div>`;
+  if(vetView==='log'){const j=sortJ(S.vet);
+  return seg+`<div class="card"><h2>Обробки та лікування</h2>${j.length?`<div class="list">${j.map(v=>{const it=byId('items',v.item);
+   return `<button class="li" data-a="edit" data-c="vet" data-id="${esc(v.id)}">${dateCell(v.date)}<div class="main"><div class="t"><span class="tag">${esc(v.kind)}</span> ${esc(v.sow?'Свиноматка '+tagOf(v.sow):gname(v.group))}</div><div class="s">${esc([it?it.name+' — '+n(v.qty)+' '+it.unit:'',v.note].filter(Boolean).join(' · '))}</div></div><div class="v num">${mf.format(+v.heads||0)}<small>гол.</small></div></button>`}).join('')}</div>`:'<p class="empty">Ще немає записів. Натисніть «+» → «Ветобробка».</p>'}</div>`}
+  const noPlan=!S.vetplan.length;
+  const stdBtn=`<div class="card"><h2>Схема обробок порожня</h2><p style="margin:0 0 12px">Додайте типову схему для свиноферми замкненого циклу: поросята, свиноматки по циклу (осіменіння → опорос → відлучення), дорощування й відгодівля. Її можна змінити під ваше господарство.</p><div class="btns"><button class="btn primary" data-a="stdplan">Додати типову схему</button></div></div>`;
+  if(vetView==='plan'){if(noPlan)return seg+stdBtn;
+    const isSow=p=>p.target==='Свиноматки',num=p=>+p.from||0;
+    const secs=[['Поросята й молодняк — від дати опоросу',p=>p.anchor===A_BIRTH&&!isSow(p),(a,b)=>num(a)-num(b)],
+      ['Свиноматки — після осіменіння',p=>p.anchor===A_MATE,(a,b)=>num(a)-num(b)],
+      ['Свиноматки — перед опоросом',p=>p.anchor===A_PRE,(a,b)=>num(b)-num(a)],
+      ['Свиноматки — після опоросу',p=>p.anchor===A_BIRTH&&isSow(p),(a,b)=>num(a)-num(b)],
+      ['Свиноматки — після відлучення',p=>p.anchor===A_WEAN,(a,b)=>num(a)-num(b)],
+      ['Без прив\'язки до дати',p=>p.anchor===A_NONE||!ANCHORS.includes(p.anchor),(a,b)=>PLAN_TARGETS.indexOf(a.target)-PLAN_TARGETS.indexOf(b.target)]];
+    const row=p=>`<button class="li" data-a="edit" data-c="vetplan" data-id="${esc(p.id)}"><div class="main"><div class="t">${esc(p.name)}</div><div class="s">${esc([planDays(p),p.anchor===A_NONE||isSow(p)?'':p.target,p.what].filter(Boolean).join(' · '))}</div>${drugLine(p)}</div></button>`;
+    return seg+`<p class="note">Це типова схема. Препарати, дози й строки узгодьте з ветлікарем: вони залежать від інструкції до препарату та ситуації з хворобами у вашому районі. Будь-який пункт можна змінити. Очікуваний опорос = осіменіння + ${GEST} днів.</p>
+    ${secs.map(([t,f,so])=>{const l=S.vetplan.filter(f).sort(so);return l.length?`<div class="card"><h2>${t}</h2><div class="list">${l.map(row).join('')}</div></div>`:''}).join('')}
+    <div class="btns"><button class="btn" data-a="form" data-k="plan">Додати пункт</button>${DEFAULT_PLAN.some(p=>!byId('vetplan',p.id))?'<button class="btn" data-a="stdplan">Додати типові</button>':''}</div>`}
+  if(noPlan)return seg+stdBtn;
+  const rs=reminders();const sc=stockCalc();
+  const lbl={over:'Прострочено',now:'Зараз',soon:'Найближчі 7 днів'};
+  const sec=st=>{const l=rs.filter(r=>r.st===st);if(!l.length)return '';
+    return `<div class="card"><h2>${lbl[st]} · ${l.length}</h2><div class="list">${l.map(r=>`<button class="li" data-a="rem" data-b="${esc(r.batch)}" data-p="${esc(r.p.id)}"><div class="main"><div class="t">${esc(r.p.name)}</div><div class="s">${esc(remDesc(r))}</div>${drugLine(r.p,sc)}</div><div class="v">${remPill(r)}</div></button>`).join('')}</div></div>`};
+  const any=S.moves.some(m=>m.type==='birth')||S.sowev.length;
+  return seg+(rs.length?sec('over')+sec('now')+sec('soon'):`<div class="card"><p class="empty">${any?'На найближчий тиждень робіт за схемою немає':'Нагадування з\'являться, коли ви внесете опорос або осіменіння'}</p></div>`)+
+   `<p class="note">Кожен пункт з'являється тут за 7 днів до строку. Рахується від дат опоросів, осіменінь і відлучень за вашою схемою.</p>`;
+}
+const supKey=x=>String(x||'').trim().toLowerCase();
+function suppliers(){const m=new Map();[...S.stock.filter(o=>o.kind==='in'),...S.supay].forEach(o=>{const k=supKey(o.supplier);if(k&&!m.has(k))m.set(k,String(o.supplier).trim())});return [...m.values()].sort((a,b)=>a.localeCompare(b,'uk'))}
+function debts(){const m={};const get=x=>{const k=supKey(x);return m[k]=m[k]||{name:String(x).trim(),bought:0,paid:0,buys:[],pays:[]}};
+  for(const o of S.stock)if(o.kind==='in'&&o.pay==='Не оплачено'&&supKey(o.supplier)){const d=get(o.supplier);d.bought+=(+o.qty||0)*(+o.price||0);d.buys.push(o)}
+  for(const p of S.supay)if(supKey(p.supplier)){const d=get(p.supplier);d.paid+=+p.sum||0;d.pays.push(p)}
+  return Object.values(m).map(d=>({...d,debt:d.bought-d.paid})).sort((a,b)=>b.debt-a.debt)}
+function expRows(r){return [['Корми',r.mat.Корм],['Ветпрепарати',r.mat.Ветпрепарат],['Сперма для осіменіння',r.mat.Сперма],['Інші матеріали',r.mat.Інше],...Object.entries(r.costs),['Зарплата',r.pay]].filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1])}
+function vMoney(){
+  const costs=sortJ(S.costs.filter(c=>inMonth(c.date)));const pay=sortJ(S.pay.filter(p=>inMonth(p.date)));
+  const cs=costs.reduce((a,c)=>a+(+c.sum||0),0),ps=pay.reduce((a,c)=>a+(+c.sum||0),0);
+  let body='';
+  if(moneyView==='costs'){const r=monthStats();const rows=expRows(r);const mx=Math.max(1,...rows.map(x=>x[1]));
+   const buys=sortJ(S.stock.filter(o=>o.kind==='in'&&inMonth(o.date)));
+   body=`<div class="card"><h2>Усі витрати місяця · ${money(r.totalCost)}</h2>${rows.length?`<div class="bars">${rows.map(([k,v])=>`<div class="bar"><div class="row"><span>${esc(k)}</span><span class="num">${money(v)}</span></div><div class="track"><div class="fill" style="width:${(v/mx*100).toFixed(1)}%"></div></div></div>`).join('')}</div>`:'<p class="empty">Витрат немає</p>'}
+   <p class="hint" style="margin:8px 0 0">Матеріали: закупівлі «одразу у витрати» плюс списані зі складу корми, препарати й дози.</p></div>
+   <div class="card"><h2>Закупівлі на склад · ${money(buys.reduce((a,o)=>a+(+o.qty||0)*(+o.price||0),0))}</h2>${buys.length?`<div class="list">${buys.map(o=>{const it=byId('items',o.item);return `<button class="li" data-a="edit" data-c="stock" data-id="${esc(o.id)}">${dateCell(o.date)}<div class="main"><div class="t">${esc(it?.name||'—')}</div><div class="s">${esc([n(o.qty)+' '+(it?.unit||'')+' × '+nf.format(o.price||0)+' ₴',o.supplier,o.exp===EXP_NOW?'у витратах':'у витрати при використанні',o.note].filter(Boolean).join(' · '))}</div></div><div class="v num">${money((+o.qty||0)*(+o.price||0))}</div></button>`}).join('')}</div>`:'<p class="empty">У цьому місяці закупівель немає</p>'}</div>
+   <div class="card"><h2>Інші витрати · ${money(cs)}</h2>${costs.length?`<div class="list">${costs.map(c=>`<button class="li" data-a="edit" data-c="costs" data-id="${esc(c.id)}">${dateCell(c.date)}<div class="main"><div class="t">${esc(c.cat)}</div>${c.note||c.group?`<div class="s">${esc([c.group?gname(c.group):'',c.note].filter(Boolean).join(' · '))}</div>`:''}</div><div class="v num">${money(c.sum)}</div></button>`).join('')}</div>`:'<p class="empty">Немає витрат у цьому місяці</p>'}</div>`}
+  else if(moneyView==='debt'){const ds=debts();const tot=ds.reduce((a,d)=>a+Math.max(0,d.debt),0);const open=ds.filter(d=>d.debt>0.5),closed=ds.filter(d=>d.debt<=0.5);
+   body=`<div class="card hero"><div class="big num">${money(tot)}</div><div class="lbl">загальний борг постачальникам</div></div>
+   ${open.length?open.map(d=>`<div class="card"><h2>${esc(d.name)} · борг ${money(d.debt)}</h2><div class="list">
+     ${sortJ(d.buys).map(o=>{const it=byId('items',o.item);return `<button class="li" data-a="edit" data-c="stock" data-id="${esc(o.id)}">${dateCell(o.date)}<div class="main"><div class="t">${esc(it?.name||'—')}</div><div class="s">${esc(n(o.qty)+' '+(it?.unit||'')+' × '+nf.format(o.price||0)+' ₴')}</div></div><div class="v num">${money((+o.qty||0)*(+o.price||0))}</div></button>`}).join('')}
+     ${sortJ(d.pays).map(p=>`<button class="li" data-a="edit" data-c="supay" data-id="${esc(p.id)}">${dateCell(p.date)}<div class="main"><div class="t"><span class="tag plus">Оплата</span></div>${p.note?`<div class="s">${esc(p.note)}</div>`:''}</div><div class="v num" style="color:var(--good)">−${money(p.sum)}</div></button>`).join('')}</div>
+     <div class="btns" style="margin-top:8px"><button class="btn primary" data-a="payout" data-s="${esc(d.name)}" data-v="${Math.round(d.debt*100)/100}">Оплатити</button></div></div>`).join(''):'<div class="card"><p class="empty">Боргів немає. Щоб закупівля потрапила сюди, у приході на склад оберіть «Не оплачено» й вкажіть постачальника.</p></div>'}
+   ${closed.length?`<div class="card"><h2>Розраховано</h2><div class="list">${closed.map(d=>`<div class="li"><div class="main"><div class="t">${esc(d.name)}</div><div class="s">${money(d.bought)} закуплено в борг · сплачено ${money(d.paid)}</div></div><div class="v"><span class="pill lact">0 ₴</span></div></div>`).join('')}</div></div>`:''}
+   <div class="btns"><button class="btn" data-a="form" data-k="supay">Внести оплату</button></div>`}
+  else{const per={};pay.forEach(p=>{(per[p.worker]=per[p.worker]||{sum:0,works:[]});per[p.worker].sum+=+p.sum||0;if(p.work)per[p.worker].works.push(p.work)});
+   body=`<div class="card"><h2>Зарплата по працівниках · ${money(ps)}</h2>${Object.keys(per).length?`<div class="list">${Object.entries(per).map(([w,x])=>{const wk=byId('workers',w);return `<div class="li"><div class="main"><div class="t">${esc(wk?.name||'—')}</div><div class="s">${esc([wk?.role,[...new Set(x.works)].join(', ')].filter(Boolean).join(' · '))}</div></div><div class="v num">${money(x.sum)}</div></div>`}).join('')}</div>`:'<p class="empty">Немає нарахувань у цьому місяці</p>'}</div>
+   <div class="card"><h2>Нарахування</h2>${pay.length?`<div class="list">${pay.map(p=>`<button class="li" data-a="edit" data-c="pay" data-id="${esc(p.id)}">${dateCell(p.date)}<div class="main"><div class="t">${esc(byId('workers',p.worker)?.name||'—')}</div><div class="s">${esc(p.work||'')}</div></div><div class="v num">${money(p.sum)}</div></button>`).join('')}</div>`:'<p class="empty">—</p>'}</div>`}
+  return (moneyView==='debt'?'':monthBar())+`<div class="seg" role="group"><button data-a="mv" data-v="costs" aria-pressed="${moneyView==='costs'}">Витрати</button><button data-a="mv" data-v="pay" aria-pressed="${moneyView==='pay'}">Зарплата</button><button data-a="mv" data-v="debt" aria-pressed="${moneyView==='debt'}">Борги</button></div>`+body;
+}
+
+/* ---------- forms ---------- */
+const D={k:'date',l:'Дата',t:'date'},NOTE={k:'note',l:'Примітка',t:'text',opt:1};
+const F={
+ start:{title:'Початкове поголів\'я',col:'moves',type:'start',f:[D,{k:'to',l:'Група',t:'group'},{k:'count',l:'Голів',t:'int'},NOTE],hint:'Залишок тварин у групі на дату початку обліку'},
+ birth:{title:'Опорос',col:'moves',type:'birth',f:[D,{k:'sow',l:'Свиноматка (якщо ведете поіменно)',t:'sow',opt:1},{k:'to',l:'Куди зарахувати поросят',t:'group',pref:'Поросята-сисуни'},{row:[{k:'count',l:'Народжено живих',t:'int'},{k:'dead',l:'Мертвонароджених',t:'int',opt:1}]},{k:'litters',l:'Кількість опоросів',t:'int',opt:1},NOTE]},
+ transfer:{title:'Переведення',col:'moves',type:'transfer',f:[D,{k:'from',l:'З групи',t:'group'},{k:'to',l:'У групу',t:'group'},{row:[{k:'count',l:'Голів',t:'int'},{k:'weight',l:'Загальна вага, кг',t:'num',opt:1}]},NOTE]},
+ death:{title:'Падіж',col:'moves',type:'death',f:[D,{k:'from',l:'Група',t:'group'},{row:[{k:'count',l:'Голів',t:'int'},{k:'weight',l:'Вага, кг',t:'num',opt:1}]},{k:'reason',l:'Причина',t:'text',opt:1}]},
+ sale:{title:'Продаж / забій',col:'moves',type:'sale',f:[D,{k:'from',l:'Група',t:'group'},{row:[{k:'count',l:'Голів',t:'int'},{k:'weight',l:'Жива вага, кг',t:'num',opt:1}]},{k:'sum',l:'Сума, ₴',t:'num',opt:1},NOTE]},
+ buy:{title:'Купівля',col:'moves',type:'buy',f:[D,{k:'to',l:'Група',t:'group'},{row:[{k:'count',l:'Голів',t:'int'},{k:'weight',l:'Вага, кг',t:'num',opt:1}]},{k:'sum',l:'Сума, ₴',t:'num',opt:1},NOTE]},
+ receipt:{title:'Прихід на склад',col:'stock',kind:'in',f:[D,{k:'item',l:'Матеріал',t:'item'},{row:[{k:'qty',l:'Кількість',t:'num'},{k:'price',l:'Ціна за од., ₴',t:'num'}]},{k:'exp',l:'Вартість у витрати',t:'sel',opts:[EXP_NOW,EXP_USE]},{row:[{k:'supplier',l:'Постачальник',t:'supplier',opt:1},{k:'pay',l:'Оплата',t:'sel',opts:['Оплачено','Не оплачено']}]},NOTE],hint:'«Не оплачено» — сума потрапить у борги постачальнику. «Одразу у витрати» — сума потрапляє у витрати місяця закупівлі, а використання вдруге не рахується. «При використанні» — у витрати йде лише те, що списали (згодували, використали).'},
+ feed:{title:'Списання на групу',col:'stock',kind:'out',f:[D,{k:'item',l:'Корм / матеріал',t:'item',cat:'Готовий корм'},{k:'group',l:'Група',t:'group'},{k:'qty',l:'Кількість',t:'num'},NOTE],hint:'Можна вносити щодня або сумою за період'},
+ vet:{title:'Ветобробка',col:'vet',f:[D,{k:'group',l:'Група',t:'group'},{k:'kind',l:'Вид',t:'sel',opts:VET_KINDS},{k:'item',l:'Препарат зі складу',t:'item',cat:'Ветпрепарат',opt:1},{row:[{k:'qty',l:'Витрачено',t:'num',opt:1},{k:'heads',l:'Оброблено голів',t:'int'}]},NOTE],hint:'Витрачений препарат автоматично списується зі складу'},
+ supay:{title:'Оплата постачальнику',col:'supay',f:[D,{k:'supplier',l:'Постачальник',t:'supplier'},{k:'sum',l:'Сума, ₴',t:'num'},NOTE],hint:'Оплата зменшує борг. У витрати вона вдруге не йде: вартість врахована при закупівлі.'},
+ cost:{title:'Витрата',col:'costs',f:[D,{k:'cat',l:'Стаття',t:'sel',opts:COST_CATS},{k:'sum',l:'Сума, ₴',t:'num'},{k:'group',l:'Група (якщо стосується)',t:'group',opt:1},NOTE]},
+ pay:{title:'Зарплата',col:'pay',f:[D,{k:'worker',l:'Працівник',t:'worker'},{k:'work',l:'Що робив',t:'text',opt:1},{k:'sum',l:'Сума, ₴',t:'num'}]},
+ group:{title:'Група тварин',col:'groups',ref:1,f:[{k:'name',l:'Назва',t:'text'},{k:'cat',l:'Категорія',t:'sel',opts:GROUP_CATS},{k:'place',l:'Приміщення',t:'text',opt:1}]},
+ item:{title:'Матеріал',col:'items',ref:1,f:[{k:'name',l:'Назва',t:'text'},{row:[{k:'unit',l:'Одиниця',t:'sel',opts:UNITS},{k:'cat',l:'Тип',t:'sel',opts:ITEM_CATS}]},{k:'min',l:'Мінімальний залишок',t:'num',opt:1}],hint:'Нижче мінімуму — позначка «мало»'},
+ plan:{title:'Пункт схеми',col:'vetplan',ref:1,f:[{k:'name',l:'Що робити',t:'text'},{k:'target',l:'Кому',t:'sel',opts:PLAN_TARGETS},{k:'anchor',l:'Від чого рахувати',t:'sel',opts:ANCHORS},{row:[{k:'from',l:'З (днів)',t:'int',opt:1},{k:'to',l:'По (днів)',t:'int',opt:1}]},{k:'action',l:'Що внести, коли зроблено',t:'sel',opts:ACTIONS},{k:'drug',l:'Препарат (назва)',t:'text',opt:1},{k:'what',l:'Спосіб, примітка',t:'text',opt:1},{k:'item',l:'Препарат зі складу',t:'item',cat:'Ветпрепарат',opt:1}],hint:'Від опоросу: 1 — день опоросу. Від осіменіння чи відлучення: 0 — той самий день. До опоросу: «З» — більше днів (напр. 14), «По» — менше (7); опорос = осіменіння + 114 днів. Для пунктів без прив\'язки строки напишіть у примітці.'},
+ sow:{title:'Свиноматка',col:'sows',ref:1,f:[{k:'tag',l:'Номер або кличка',t:'text'},{k:'group',l:'Група',t:'group',opt:1,pref:'Свиноматки'},{k:'born',l:'Дата народження',t:'date',opt:1},{k:'status',l:'Стан',t:'sel',opts:['В стаді','Вибракувана']},NOTE]},
+ mate:{title:'Осіменіння',col:'sowev',type:'mate',f:[D,{k:'sow',l:'Свиноматка',t:'sow'},{row:[{k:'semen',l:'Сперма (зі складу)',t:'item',cat:'Сперма',opt:1},{k:'doses',l:'Доз',t:'num',opt:1}]},{k:'boar',l:'Або: кабан / інше',t:'text',opt:1},NOTE],hint:'Доза списується зі складу (за замовчуванням 1; при подвійному осіменінні вкажіть 2). Очікуваний опорос — через 114 днів.'},
+ 'return':{title:'Перегул',col:'sowev',type:'return',f:[D,{k:'sow',l:'Свиноматка',t:'sow'},{k:'note',l:'Примітка (напр. повторна охота, УЗД — непоросна)',t:'text',opt:1}],hint:'Після перегулу свиноматку потрібно осіменити повторно: «Осіменіння» в її картці.'},
+ wean:{title:'Відлучення',col:'sowev',type:'wean',f:[D,{k:'sow',l:'Свиноматка',t:'sow'},{k:'count',l:'Відлучено поросят',t:'int',opt:1},NOTE],hint:'Поросят у групу дорощування переведіть окремо: «+» → «Переведення».'},
+ worker:{title:'Працівник',col:'workers',ref:1,f:[{k:'name',l:'Ім\'я',t:'text'},{k:'role',l:'Посада',t:'text',opt:1}]},
+};
+function formKeyFor(col,doc){if(col==='supay')return 'supay';if(col==='moves'||col==='sowev')return doc.type;if(col==='stock')return doc.kind==='in'?'receipt':'feed';return {vet:'vet',costs:'cost',pay:'pay',groups:'group',items:'item',workers:'worker',vetplan:'plan',sows:'sow'}[col]}
+function fieldHtml(f,v){
+  const id='f_'+f.k,req=f.opt?'':' required',val=v??(f.t==='date'&&!f.opt?today():'');
+  let ctl='';
+  const options=(list,cur,empty)=>`<option value="">${empty}</option>`+list.map(o=>`<option value="${esc(o.id)}"${o.id===cur?' selected':''}>${esc(o.name)}</option>`).join('');
+  if(f.t==='group'){let cur=val;if(!cur&&f.pref){cur=S.groups.find(g=>g.cat===f.pref)?.id||''}ctl=`<select id="${id}" name="${f.k}"${req}>${options(S.groups,cur,f.opt?'— не вказано —':'Оберіть групу')}</select>`}
+  else if(f.t==='item'){const sc=stockCalc();const its=S.items.slice().sort((a,b)=>(b.cat===f.cat)-(a.cat===f.cat)||String(a.name).localeCompare(String(b.name),'uk'));ctl=`<select id="${id}" name="${f.k}"${req}>${options(its.map(i=>({id:i.id,name:i.name+' — '+n(sc[i.id]?.bal||0)+' '+i.unit})),val,f.opt?'— без препарату —':'Оберіть')}</select>`}
+  else if(f.t==='sow'){const ss=S.sows.filter(s=>s.status!=='Вибракувана'||s.id===val).slice().sort((a,b)=>String(a.tag).localeCompare(String(b.tag),'uk',{numeric:true}));ctl=`<select id="${id}" name="${f.k}"${req}>${options(ss.map(s=>({id:s.id,name:'№ '+s.tag})),val,f.opt?'— не вказано —':'Оберіть свиноматку')}</select>`}
+  else if(f.t==='supplier'){const list=suppliers();ctl=`<input id="${id}" name="${f.k}" type="text" list="dl_${id}" autocomplete="off" value="${esc(val)}"${req}><datalist id="dl_${id}">${list.map(x=>`<option value="${esc(x)}"></option>`).join('')}</datalist>`}
+  else if(f.t==='worker')ctl=`<select id="${id}" name="${f.k}"${req}>${options(S.workers,val,'Оберіть працівника')}</select>`;
+  else if(f.t==='sel')ctl=`<select id="${id}" name="${f.k}"${req}>${f.opts.map(o=>`<option${o===val?' selected':''}>${esc(o)}</option>`).join('')}</select>`;
+  else if(f.t==='int'||f.t==='num')ctl=`<input id="${id}" name="${f.k}" type="number" inputmode="${f.t==='int'?'numeric':'decimal'}" step="${f.t==='int'?1:'any'}" min="0" value="${esc(val)}"${req}>`;
+  else ctl=`<input id="${id}" name="${f.k}" type="${f.t==='date'?'date':'text'}" value="${esc(val)}"${req}>`;
+  return `<label class="f" for="${id}">${esc(f.l)}${ctl}</label>`;
+}
+let formExtra=null;
+function openForm(key,doc,pre,extra,ov){formExtra=extra||null;ov=ov||{};
+  const spec={...F[key],...(ov.title?{title:ov.title}:{}),...(ov.hint?{hint:ov.hint}:{}),...(ov.itemCat?{f:F[key].f.map(f=>f.t==='item'?{...f,cat:ov.itemCat,l:'Лінія сперми'}:f)}:{})};const need=spec.f.flatMap(f=>f.row||[f]).filter(f=>!f.opt).map(f=>f.t);
+  let block='';
+  if(need.includes('group')&&!S.groups.length)block='Спершу додайте хоча б одну групу тварин.';
+  if(need.includes('item')&&!S.items.length)block='Спершу додайте матеріал (корм чи препарат).';
+  if(need.includes('worker')&&!S.workers.length)block='Спершу додайте працівника.';
+  if(need.includes('sow')&&!S.sows.length)block='Спершу додайте свиноматку.';
+  if(block){sheet(`<h3>${esc(spec.title)}</h3><p>${block}</p><div class="btns"><button class="btn primary" data-a="form" data-k="${need.includes('sow')?'sow':need.includes('worker')?'worker':need.includes('item')?'item':'group'}">Додати</button></div>`);return}
+  const v=doc||pre||{};
+  const fh=spec.f.map(f=>f.row?`<div class="two">${f.row.map(x=>fieldHtml(x,v[x.k])).join('')}</div>`:fieldHtml(f,v[f.k])).join('');
+  sheet(`<h3>${doc?'Редагувати: ':''}${esc(spec.title)}</h3><form id="frm" novalidate>${fh}${spec.hint?`<div class="hint">${esc(spec.hint)}</div>`:''}<div class="err" id="ferr" hidden></div>
+   <div class="btns">${doc?`<button type="button" class="btn danger" data-a="delete" data-c="${spec.col}" data-id="${esc(doc.id)}">Видалити</button>`:''}<button class="btn primary" type="submit">Зберегти</button></div></form>`);
+  const frm=document.getElementById('frm');
+  frm.addEventListener('submit',async e=>{e.preventDefault();
+    const out={},fl=spec.f.flatMap(f=>f.row||[f]);let err='';
+    for(const f of fl){const el=frm.querySelector('[name="'+f.k+'"]');const raw=String(el?.value??'').trim();
+      if(!raw){if(!f.opt)err=err||`Заповніть поле «${f.l}»`;continue}
+      if(f.t==='int'||f.t==='num'){const x=Number(raw.replace(',','.'));if(!isFinite(x)||x<0){err=err||`«${f.l}»: потрібне додатне число`;continue}if(f.t==='int'&&!Number.isInteger(x)){err=err||`«${f.l}»: ціле число`;continue}out[f.k]=x}
+      else out[f.k]=raw}
+    if(!err&&spec.col==='moves'){
+      if(['transfer','death','sale'].includes(spec.type)&&!(out.count>0))err='Кількість голів має бути більше нуля';
+      if(spec.type==='transfer'&&out.from===out.to)err='Оберіть різні групи';
+      if(!err&&out.from){const h=heads(out.date);let avail=h[out.from]||0;if(doc&&doc.from===out.from)avail+=+doc.count||0;
+        if(out.count>avail)err=`У групі «${gname(out.from)}» на ${out.date} лише ${mf.format(avail)} гол.`}}
+    if(!err&&spec.col==='vetplan'&&out.anchor!==A_NONE){if(out.from==null)err='Вкажіть, з якого дня робити';else if(out.to!=null&&(out.anchor===A_PRE?out.to>out.from:out.to<out.from))err=out.anchor===A_PRE?'Для «до опоросу»: «По» має бути меншим за «З» (напр. з 14 по 7)':'«По» не може бути меншим за «З»'}
+    if(!err&&spec.type==='birth'&&out.sow&&!out.litters)out.litters=1;
+    if(!err&&spec.type==='mate'&&out.semen&&out.doses==null)out.doses=1;
+    if(!err&&spec.type==='mate'){const sw=byId('sows',out.sow);if(sw?.status==='Вибракувана')err='Свиноматка позначена як вибракувана'}
+    if(!err&&spec.col==='vet'&&out.item&&!out.qty)err='Вкажіть, скільки препарату витрачено';
+    const ferr=document.getElementById('ferr');if(err){ferr.textContent=err;ferr.hidden=false;return}
+    if(spec.type)out.type=spec.type;if(spec.kind)out.kind=spec.kind;
+    if(doc){out.t=doc.t;['demo','std','plan','batch'].forEach(k=>{if(doc[k]!=null)out[k]=doc[k]})}else if(formExtra)Object.assign(out,formExtra);
+    const btn=frm.querySelector('[type=submit]');btn.disabled=true;btn.textContent='Зберігаю…';
+    try{await put(spec.col,doc?.id,out);closeSheet();toast('Збережено');
+      if(spec.col==='stock'&&spec.kind==='out'){const sc=stockCalc()[out.item];if(sc&&sc.bal<0)toast('Збережено. Залишок пішов у мінус — внесіть прихід')}}
+    catch(e){btn.disabled=false;btn.textContent='Зберегти';ferr.textContent=saveErr(e);ferr.hidden=false}
+  });
+}
+function saveErr(e){return e?.code==='permission-denied'?'Немає доступу. Увійдіть знову.':e?.code==='quota_exceeded'?'Сховище заповнене. Видаліть старі записи й спробуйте ще раз.':'Не вдалося зберегти. Перевірте інтернет і спробуйте ще раз.'}
+function inUse(col,id){if(col==='groups')return S.moves.some(m=>m.from===id||m.to===id)||S.stock.some(o=>o.group===id)||S.vet.some(v=>v.group===id);
+  if(col==='items')return S.sowev.some(e=>e.semen===id)||S.prod.some(p=>p.out===id||(p.parts||[]).some(c=>c.item===id))||S.stock.some(o=>o.item===id)||S.vet.some(v=>v.item===id)||S.vetplan.some(p=>p.item===id);if(col==='workers')return S.pay.some(p=>p.worker===id);if(col==='sows')return S.sowev.some(e=>e.sow===id)||S.moves.some(m=>m.sow===id)||S.vet.some(v=>v.sow===id);return false}
+function sheet(html){document.getElementById('layer').innerHTML=`<div class="scrim" data-a="close"></div><div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div>`;
+  const f=document.querySelector('.sheet input,.sheet select,.sheet button');}
+function closeSheet(){document.getElementById('layer').innerHTML=''}
+function openProd(id){
+  const doc=id?byId('prod',id):null;
+  if(!S.items.length){sheet(`<h3>Виготовлення корму</h3><p>Спершу додайте сировину (зерно, премікс…) і готовий корм у довідник матеріалів.</p><div class="btns"><button class="btn primary" data-a="form" data-k="item">Додати матеріал</button></div>`);return}
+  const sc=stockCalc();
+  const itemsSorted=pref=>S.items.slice().sort((a,b)=>(b.cat===pref)-(a.cat===pref)||(a.t||0)-(b.t||0));
+  const opts=(pref,cur,empty)=>`<option value="">${empty}</option>`+itemsSorted(pref).map(i=>`<option value="${esc(i.id)}"${i.id===cur?' selected':''}>${esc(i.name)} (${esc(i.unit)})</option>`).join('');
+  const partRow=(c,k)=>`<div class="two prow" style="grid-template-columns:minmax(0,1fr) 96px 36px;align-items:end"><label class="f" for="pi${k}">Сировина<select id="pi${k}" class="pitem">${opts('Сировина',c.item,'Оберіть')}</select></label><label class="f" for="pq${k}">Кількість<input id="pq${k}" class="pqty" type="number" inputmode="decimal" step="any" min="0" value="${esc(c.qty??'')}"></label><button type="button" class="iconbtn" data-a="prodrm" aria-label="Прибрати рядок" style="width:36px;height:44px">×</button></div>`;
+  const parts=doc?.parts?.length?doc.parts:[{},{},{}];
+  sheet(`<h3>${doc?'Редагувати: ':''}Виготовлення корму</h3><form id="pfrm" novalidate>
+   <label class="f" for="p_date">Дата<input id="p_date" type="date" value="${esc(doc?.date||today())}"></label>
+   <div class="two"><label class="f" for="p_out">Готовий корм<select id="p_out">${opts('Готовий корм',doc?.out,'Оберіть')}</select></label>
+   <label class="f" for="p_qty">Вийшло<input id="p_qty" type="number" inputmode="decimal" step="any" min="0" value="${esc(doc?.outQty??'')}"></label></div>
+   <h4 style="margin:4px 0 0">Що пішло</h4><div id="parts" style="display:flex;flex-direction:column;gap:8px">${parts.map(partRow).join('')}</div>
+   <button type="button" class="linkbtn" data-a="prodadd" style="align-self:flex-start">+ Ще компонент</button>
+   <div class="note" id="psum">—</div>
+   <label class="f" for="p_note">Примітка<input id="p_note" type="text" value="${esc(doc?.note||'')}"></label>
+   <div class="err" id="ferr" hidden></div>
+   <div class="btns">${doc?`<button type="button" class="btn danger" data-a="delete" data-c="prod" data-id="${esc(doc.id)}">Видалити</button>`:''}<button class="btn primary" type="submit">Зберегти</button></div></form>`);
+  const f=document.getElementById('pfrm');let k=parts.length;
+  const read=()=>[...f.querySelectorAll('.prow')].map(r=>({item:r.querySelector('.pitem').value,qty:Number(String(r.querySelector('.pqty').value).replace(',','.'))})).filter(c=>c.item||c.qty);
+  const upd=()=>{const ps=read().filter(c=>c.item&&c.qty>0);const cost=ps.reduce((a,c)=>a+c.qty*(sc[c.item]?.avg||0),0);const tq=ps.reduce((a,c)=>a+c.qty,0);const oq=+f.querySelector('#p_qty').value||0;
+    const it=byId('items',f.querySelector('#p_out').value);
+    const low=ps.filter(c=>(sc[c.item]?.bal||0)+(doc?.parts||[]).filter(d=>d.item===c.item).reduce((a,d)=>a+(+d.qty||0),0)<c.qty).map(c=>byId('items',c.item)?.name);
+    document.getElementById('psum').innerHTML=ps.length?`Сировини: <b class="num">${n(tq)}</b> · вартість <b class="num">${money(cost)}</b>${oq?` · собівартість <b class="num">${nf.format(cost/oq)} ₴/${esc(it?.unit||'од.')}</b>`:''}${oq&&tq?` · вихід ${nf.format(oq/tq*100)}%`:''}${low.length?`<br><span style="color:var(--warn)">Не вистачає на складі: ${esc(low.join(', '))} — залишок піде в мінус</span>`:''}`:'Додайте сировину, щоб побачити собівартість';};
+  f.addEventListener('input',upd);f.addEventListener('change',e=>{
+    if(e.target.id==='p_out'&&!doc&&!read().some(c=>c.item)){const last=sortJ(S.prod.filter(p=>p.out===e.target.value))[0];
+      if(last){document.getElementById('parts').innerHTML=last.parts.map(partRow).join('');k=last.parts.length;if(!f.querySelector('#p_qty').value)f.querySelector('#p_qty').value=last.outQty;toast('Підставлено склад з останнього виготовлення')}}
+    upd()});
+  f.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;
+    if(b.dataset.a==='prodadd'){e.stopPropagation();document.getElementById('parts').insertAdjacentHTML('beforeend',partRow({},k++))}
+    if(b.dataset.a==='prodrm'){e.stopPropagation();b.closest('.prow').remove();upd()}});
+  upd();
+  f.addEventListener('submit',async e=>{e.preventDefault();const fe=document.getElementById('ferr');
+    const out=f.querySelector('#p_out').value,oq=Number(String(f.querySelector('#p_qty').value).replace(',','.')),date=f.querySelector('#p_date').value;
+    const ps=read();let err='';
+    if(!date)err='Вкажіть дату';else if(!out)err='Оберіть готовий корм';else if(!(oq>0))err='Вкажіть, скільки вийшло готового корму';
+    else if(ps.some(c=>!c.item||!(c.qty>0)))err='У кожному рядку сировини оберіть матеріал і вкажіть кількість (порожні рядки приберіть ×)';
+    else if(!ps.length)err='Додайте хоча б один компонент';else if(ps.some(c=>c.item===out))err='Готовий корм не може бути власною сировиною';
+    if(err){fe.textContent=err;fe.hidden=false;return}
+    const data={date,out,outQty:oq,parts:ps,note:f.querySelector('#p_note').value.trim(),t:doc?.t||Date.now()};
+    const btn=f.querySelector('[type=submit]');btn.disabled=true;btn.textContent='Зберігаю…';
+    try{await put('prod',doc?.id,data);closeSheet();toast('Збережено: +'+n(oq)+' '+(byId('items',out)?.unit||''))}catch(x){btn.disabled=false;btn.textContent='Зберегти';fe.textContent=saveErr(x);fe.hidden=false}});
+}
+function addMenu(){
+  const a=(k,t,s)=>`<button class="act" data-a="form" data-k="${k}">${t}<small>${s}</small></button>`;
+  sheet(`<h3>Новий запис</h3><h4>Поголів'я</h4><div class="acts">${a('birth','Опорос','поросята +')}${a('transfer','Переведення','між групами')}${a('death','Падіж','голови −')}${a('sale','Продаж / забій','голови, кг, ₴')}${a('buy','Купівля','голови +')}${a('start','Початкове поголів\'я','старт обліку')}</div>
+  <h4>Склад</h4><div class="acts"><button class="act" data-a="semin">Прихід доз сперми<small>для осіменіння</small></button><button class="act" data-a="prod">Виготовлення корму<small>сировина → готовий корм</small></button>${a('feed','Списання корму','на групу')}${a('receipt','Прихід','сировина, препарати')}</div>
+  <h4>Інше</h4><div class="acts">${a('vet','Ветобробка','щеплення, лікування')}${a('cost','Витрата','світло, пальне…')}${a('pay','Зарплата','нарахування')}</div>`)}
+function settings(){
+  const sec=(t,col,k)=>`<h4>${t}</h4><div class="list">${S[col].slice().sort((a,b)=>(a.t||0)-(b.t||0)).map(x=>`<button class="li" data-a="edit" data-c="${col}" data-id="${esc(x.id)}"><div class="main"><div class="t">${esc(x.name)}</div><div class="s">${esc([x.cat,x.place,x.unit,x.role].filter(Boolean).join(' · '))}</div></div></button>`).join('')}</div><button class="linkbtn" data-a="form" data-k="${k}">+ Додати</button>`;
+  const anyDemo=COLS.some(c=>S[c].some(x=>x.demo));
+  sheet(`<h3>Довідники</h3>${sec('Групи тварин','groups','group')}${sec('Корми та препарати','items','item')}${sec('Працівники','workers','worker')}
+  <h4>Дані</h4><p class="hint" style="margin:0">Записи зберігаються на цьому телефоні й синхронізуються з вашим акаунтом, коли є інтернет. Акаунт: ${esc(user?.email||'')}</p>
+  <div class="btns wrap"><button class="btn" data-a="export">Експорт (резервна копія)</button><button class="btn" data-a="import">Імпорт з файлу</button><button class="btn danger" data-a="logout">Вийти</button></div>
+  ${anyDemo?'<div class="btns"><button class="btn danger" data-a="cleardemo">Видалити приклад даних</button></div>':''}`)}
+function toast(t){document.querySelector('.toast')?.remove();const d=document.createElement('div');d.className='toast';d.setAttribute('role','status');d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2600)}
+
+document.addEventListener('click',async e=>{
+  const tb=e.target.closest('[data-tab]');if(tb){tab=tb.dataset.tab;window.scrollTo(0,0);render();return}
+  const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a;
+  if(a==='add')addMenu();
+  else if(a==='settings')settings();
+  else if(a==='close')closeSheet();
+  else if(a==='form')openForm(b.dataset.k);
+  else if(a==='prod')openProd(b.dataset.id);
+  else if(a==='edit'){const doc=byId(b.dataset.c,b.dataset.id);if(doc)openForm(formKeyFor(b.dataset.c,doc),doc)}
+  else if(a==='mprev'||a==='mnext'){let[y,m]=month.split('-').map(Number);m+=a==='mprev'?-1:1;if(m<1){m=12;y--}if(m>12){m=1;y++}month=y+'-'+String(m).padStart(2,'0');render()}
+  else if(a==='mv'){moneyView=b.dataset.v;render()}
+  else if(a==='payout')openForm('supay',null,{supplier:b.dataset.s,sum:b.dataset.v});
+  else if(a==='vv'){vetView=b.dataset.v;render()}
+  else if(a==='hv'){herdView=b.dataset.v;render()}
+  else if(a==='addgroup')openForm('group',null,{cat:b.dataset.cat});
+  else if(a==='litter')litterSheet(b.dataset.id);
+  else if(a==='godebt'){tab='money';moneyView='debt';window.scrollTo(0,0);render()}
+  else if(a==='gorem'){tab='vet';vetView='rem';window.scrollTo(0,0);render()}
+  else if(a==='rem')remSheet(b.dataset.b,b.dataset.p);
+  else if(a==='stdplan'){b.disabled=true;try{await addStdPlan()}catch(err){toast(saveErr(err))}}
+  else if(a==='remdo'){const r=reminders().find(x=>x.batch===b.dataset.b&&x.p.id===b.dataset.p);if(!r)return;const p=r.p;const act=remAction(r);
+    const dm=(r.m||r.ev)?.demo?{demo:true}:{};
+    if(act===ACT_DONE){try{await put('vetskip',r.batch+'__'+p.id,{batch:r.batch,plan:p.id,done:true,date:today(),...(r.sow?{sow:r.sow.id}:{}),...dm});closeSheet();toast('Позначено виконаним')}catch(err){toast(saveErr(err))}return}
+    if(act===ACT_MATE){openForm('mate',null,{sow:r.sow.id});return}
+    if(act===ACT_FARROW){openForm('birth',null,{sow:r.sow.id,litters:1});return}
+    if(act===ACT_WEAN){openForm('wean',null,{sow:r.sow.id});return}
+    const sel=document.getElementById('remitem');let useItem=byId('items',p.item)?p.item:'';
+    if(sel){useItem=sel.value;if(document.getElementById('remkeep')?.checked&&useItem!==(p.item||'')){const{id:_i,...rest}=p;try{await put('vetplan',p.id,{...rest,item:useItem})}catch(err){}}}
+    const sowG=S.groups.find(g=>g.cat==='Свиноматки');
+    const pre=r.sow?{group:r.sow.group||sowG?.id||'',heads:1,note:p.name+' · '+tagOf(r.sow.id)}:{group:p.target==='Свиноматки'&&sowG?sowG.id:r.m?.to,heads:p.target==='Свиноматки'?(+r.m?.litters||''):r.m?.count,note:p.name};
+    openForm('vet',null,{...pre,kind:/вакцин/i.test(p.name)?'Щеплення':'Обробка',item:useItem},{plan:p.id,batch:r.batch,...(r.sow?{sow:r.sow.id}:{}),...dm})}
+  else if(a==='remskip'){const r=reminders().find(x=>x.batch===b.dataset.b&&x.p.id===b.dataset.p);const dm=(r?.m||r?.ev)?.demo?{demo:true}:{};
+    try{await put('vetskip',b.dataset.b+'__'+b.dataset.p,{batch:b.dataset.b,plan:b.dataset.p,...dm});closeSheet();toast('Прибрано з нагадувань')}catch(err){toast(saveErr(err))}}
+  else if(a==='sow')sowSheet(b.dataset.id);
+  else if(a==='semen')semenSheet(b.dataset.id);
+  else if(a==='semnew')openForm('item',null,{cat:'Сперма',unit:'доза'},null,{title:'Нова лінія сперми',hint:'Наприклад: «Сперма Дюрок» або номер кабана. Далі внесіть прихід доз.'});
+  else if(a==='semin'){const id=b.dataset.id||S.items.find(i=>i.cat==='Сперма')?.id||'';openForm('receipt',null,{item:id,exp:EXP_USE},null,{title:'Прихід доз сперми',itemCat:'Сперма',hint:'Ціна — за одну дозу. Вартість піде у витрати, коли доза буде використана при осіменінні.'})}
+  else if(a==='sowev'){const k=b.dataset.k,id=b.dataset.id;openForm(k,null,k==='birth'?{sow:id,litters:1}:{sow:id})}
+  else if(a==='more'){herdShow+=40;render()}
+  else if(a==='demo'){b.disabled=true;try{await loadDemo()}catch(err){toast(saveErr(err))}}
+  else if(a==='cleardemo'){if(!b.classList.contains('armed')){b.classList.add('armed');b.textContent='Натисніть ще раз — видалити приклад';return}closeSheet();try{await clearDemo()}catch(err){toast(saveErr(err))}}
+  else if(a==='delete'){const{c,id}=b.dataset;
+    if(inUse(c,id)){const fe=document.getElementById('ferr');fe.textContent='Цей запис використовується в журналі — спершу видаліть пов\'язані операції.';fe.hidden=false;return}
+    if(!b.classList.contains('armed')){b.classList.add('armed');b.textContent='Точно видалити?';return}
+    try{await del(c,id);closeSheet();toast('Видалено')}catch(err){toast(saveErr(err))}}
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet()});
+
+let user=null,fs=null,unsubs=[];
+function loginView(){return `<div class="login"><div class="logo">${document.querySelector('.mark').outerHTML}<b>KLG <span>Agro</span> Pigfarm</b></div>
+  <p style="margin:0;color:var(--muted)">Облік свиноферми. Увійдіть, щоб записи синхронізувались між пристроями.</p>
+  <form id="lf" class="card" novalidate style="display:flex;flex-direction:column;gap:12px">
+   <label class="f" for="le">Електронна пошта<input id="le" type="email" autocomplete="username" inputmode="email"></label>
+   <label class="f" for="lp">Пароль (мінімум 6 символів)<input id="lp" type="password" autocomplete="current-password"></label>
+   <div class="err" id="lerr" hidden></div>
+   <div class="btns"><button class="btn primary" type="submit">Увійти</button></div>
+   <div class="btns"><button class="btn" type="button" data-a="signup">Створити акаунт</button></div>
+   <button class="linkbtn" type="button" data-a="reset" style="align-self:flex-start">Забули пароль?</button></form></div>`}
+function authErr(e){const c=e?.code||'';return c.includes('invalid-credential')||c.includes('wrong-password')||c.includes('user-not-found')?'Неправильна пошта або пароль':c.includes('email-already')?'Такий акаунт уже є — натисніть «Увійти»':c.includes('weak-password')?'Пароль має бути щонайменше 6 символів':c.includes('invalid-email')?'Перевірте адресу пошти':c.includes('network')?'Немає інтернету. Для першого входу потрібен зв\'язок':c.includes('too-many')?'Забагато спроб. Зачекайте кілька хвилин':'Не вдалося: '+c}
+function lErr(t){const x=document.getElementById('lerr');if(x){x.textContent=t;x.hidden=!t}}
+document.addEventListener('submit',async e=>{if(e.target.id!=='lf')return;e.preventDefault();const em=document.getElementById('le').value.trim(),pw=document.getElementById('lp').value;
+  if(!em||!pw){lErr('Введіть пошту й пароль');return}try{await firebase.auth().signInWithEmailAndPassword(em,pw)}catch(x){lErr(authErr(x))}});
+document.addEventListener('click',async e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a;
+  if(a==='signup'){const em=document.getElementById('le').value.trim(),pw=document.getElementById('lp').value;if(!em||!pw){lErr('Введіть пошту й пароль, потім натисніть «Створити акаунт»');return}
+    try{await firebase.auth().createUserWithEmailAndPassword(em,pw)}catch(x){lErr(authErr(x))}}
+  if(a==='reset'){const em=document.getElementById('le').value.trim();if(!em){lErr('Введіть пошту, на яку надіслати лист');return}try{await firebase.auth().sendPasswordResetEmail(em);lErr('');toast('Лист для зміни пароля надіслано')}catch(x){lErr(authErr(x))}}
+  if(a==='logout'){if(!b.classList.contains('armed')){b.classList.add('armed');b.textContent='Точно вийти?';return}closeSheet();await firebase.auth().signOut()}
+  if(a==='export')exportData();
+  if(a==='import')document.getElementById('impf').click();
+});
+function exportData(){const out={app:'klg-agro',version:1,exported:new Date().toISOString(),data:{}};COLS.forEach(c=>out.data[c]=S[c]);
+  const blob=new Blob([JSON.stringify(out)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='klg-agro-'+today()+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);toast('Файл збережено')}
+async function importData(file){
+  let j;try{j=JSON.parse(await file.text())}catch(e){toast('Це не файл резервної копії KLG Agro');return}
+  const data=j?.data;if(!data||typeof data!=='object'){toast('У файлі немає даних KLG Agro');return}
+  const ops=[];for(const c of COLS)for(const d of (data[c]||[])){if(!d||!d.id)continue;const{id,...rest}=d;ops.push([c,String(id),rest])}
+  if(!ops.length){toast('Файл порожній');return}
+  toast('Імпорт: '+ops.length+' записів…');
+  for(let i=0;i<ops.length;i+=400){const batch=fs.batch();for(const[c,id,d] of ops.slice(i,i+400))batch.set(db.collection(c).doc(id),d);batch.commit().catch(e=>toast(saveErr(e)))}
+  closeSheet();toast('Імпортовано записів: '+ops.length);
+}
+function startData(u){unsubs.forEach(f=>f());unsubs=[];COLS.forEach(c=>S[c]=[]);
+  if(!u){user=null;db=null;mode='login';render();return}
+  user=u;const root=fs.collection('users').doc(u.uid);db={collection:c=>root.collection(c)};mode='loading';render();const got=new Set();
+  COLS.forEach(c=>unsubs.push(root.collection(c).onSnapshot(s=>{S[c]=s.docs.map(x=>({id:x.id,...x.data()}));got.add(c);if(got.size===COLS.length&&mode==='loading')mode='db';schedule()},err=>{toast('Помилка доступу до даних: '+(err.code||''))})));
+}
+function netBadge(){let b=document.getElementById('offl');if(navigator.onLine){b?.remove();return}if(!b){b=document.createElement('div');b.id='offl';b.className='offline';b.textContent='Без інтернету — записи збережуться на телефоні й відправляться пізніше';document.body.appendChild(b)}}
+window.addEventListener('online',netBadge);window.addEventListener('offline',netBadge);
+(function boot(){
+  const inp=document.createElement('input');inp.type='file';inp.accept='.json,application/json';inp.id='impf';inp.hidden=true;inp.addEventListener('change',()=>{if(inp.files[0])importData(inp.files[0]);inp.value=''});document.body.appendChild(inp);
+  netBadge();
+  if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+  const cfg=window.FIREBASE_CONFIG;
+  if(!window.firebase||!cfg||!cfg.apiKey){mode='noconfig';render();return}
+  firebase.initializeApp(cfg);fs=firebase.firestore();
+  fs.enablePersistence({synchronizeTabs:true}).catch(()=>{});
+  render();
+  firebase.auth().onAuthStateChanged(startData);
+})();
+</script>
+</body>
+</html>
