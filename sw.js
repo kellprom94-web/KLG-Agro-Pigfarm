@@ -1,5 +1,5 @@
 // Офлайн-кеш KLG Agro: застосунок відкривається без інтернету.
-const CACHE = 'klg-agro-v2';
+const CACHE = 'klg-agro-v3';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './firebase-config.js',
   './icon-192.png', './icon-512.png', './apple-touch-icon.png',
   'https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js',

@@ -337,6 +337,8 @@ function heads(upTo){
     if(m.type==='start'||m.type==='birth'||m.type==='buy')add(m.to,c);
     else if(m.type==='transfer'){add(m.from,-c);add(m.to,c)}
     else add(m.from,-c)}
+  const sc={};for(const x of S.sows)if(x.group&&x.group in h&&x.status!=='Вибракувана')sc[x.group]=(sc[x.group]||0)+1;
+  for(const g in sc)h[g]=sc[g];
   return h;
 }
 function stockCalc(){
