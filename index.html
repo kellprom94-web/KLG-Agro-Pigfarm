@@ -766,7 +766,7 @@ function settings(){
   const sec=(t,col,k)=>`<h4>${t}</h4><div class="list">${S[col].slice().sort((a,b)=>(a.t||0)-(b.t||0)).map(x=>`<button class="li" data-a="edit" data-c="${col}" data-id="${esc(x.id)}"><div class="main"><div class="t">${esc(x.name)}</div><div class="s">${esc([x.cat,x.place,x.unit,x.role].filter(Boolean).join(' · '))}</div></div></button>`).join('')}</div><button class="linkbtn" data-a="form" data-k="${k}">+ Додати</button>`;
   const anyDemo=COLS.some(c=>S[c].some(x=>x.demo));
   sheet(`<h3>Довідники</h3>${sec('Групи тварин','groups','group')}${sec('Корми та препарати','items','item')}${sec('Працівники','workers','worker')}
-  <h4>Дані</h4><p class="hint" style="margin:0">Записи зберігаються на цьому телефоні й синхронізуються з вашим акаунтом, коли є інтернет. Акаунт: ${esc(user?.email||'')}</p>
+  <h4>Дані</h4><p class="hint" style="margin:0">Записи зберігаються на цьому телефоні й синхронізуються з вашим акаунтом, коли є інтернет. Версія застосунку: 4. Акаунт: ${esc(user?.email||'')}</p>
   <div class="btns wrap"><button class="btn" data-a="export">Експорт (резервна копія)</button><button class="btn" data-a="import">Імпорт з файлу</button><button class="btn danger" data-a="logout">Вийти</button></div>
   ${anyDemo?'<div class="btns"><button class="btn danger" data-a="cleardemo">Видалити приклад даних</button></div>':''}`)}
 function toast(t){document.querySelector('.toast')?.remove();const d=document.createElement('div');d.className='toast';d.setAttribute('role','status');d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2600)}

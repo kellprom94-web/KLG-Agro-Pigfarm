@@ -1,5 +1,5 @@
 // Офлайн-кеш KLG Agro: застосунок відкривається без інтернету.
-const CACHE = 'klg-agro-v3';
+const CACHE = 'klg-agro-v4';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './firebase-config.js',
   './icon-192.png', './icon-512.png', './apple-touch-icon.png',
   'https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js',
@@ -18,6 +18,11 @@ self.addEventListener('fetch', e => {
   const same = u.origin === location.origin;
   const lib = u.hostname === 'www.gstatic.com' || u.hostname === 'fonts.googleapis.com' || u.hostname === 'fonts.gstatic.com';
   if (!same && !lib) return; // база даних і вхід ідуть напряму
+  if (same) { // свій код: спершу мережа (щоб оновлення приходили одразу), без мережі — кеш
+    e.respondWith(caches.open(CACHE).then(c => fetch(req).then(r => { if (r && r.ok) c.put(req, r.clone()); return r; })
+      .catch(() => c.match(req, { ignoreSearch: true }).then(h => h || c.match('./index.html')))));
+    return;
+  }
   e.respondWith(caches.open(CACHE).then(async c => {
     const hit = await c.match(req, { ignoreSearch: same });
     const net = fetch(req).then(r => { if (r && (r.ok || r.type === 'opaque')) c.put(req, r.clone()); return r; }).catch(() => hit);
