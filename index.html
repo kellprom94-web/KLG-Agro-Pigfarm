@@ -174,7 +174,7 @@ label.f input,label.f select,label.f textarea{border:1px solid var(--line);backg
 const DEMO=[];
 const COLS=['groups','items','workers','moves','stock','vet','costs','pay','vetplan','vetskip','sows','sowev','prod','supay'];
 const S={};COLS.forEach(c=>S[c]=[]);
-let db=null,mode='loading',tab='home',month='',moneyView='costs',herdShow=40,vetView='rem',herdView='sows';
+let db=null,mode='loading',tab='home',month='',moneyView='costs',herdShow=40,vetView='rem',herdView='sows',sowView=(()=>{try{return localStorage.getItem('sowView')||'list'}catch(e){return 'list'}})();
 const GROUP_CATS=['Свиноматки','Кнури','Ремонтні свинки','Поросята-сисуни','Дорощування','Відгодівля'];
 const UNITS=['кг','т','л','мл','доза','шт','фл','уп'];
 const EXP_USE='У витрати при використанні',EXP_NOW='Одразу у витрати';
@@ -522,7 +522,15 @@ function vSows(){
   const expTxt=e=>{const d=ageDays(e)-1;return 'опорос ≈ '+fmtD(e)+(d>0?` · мав бути ${d} дн. тому`:d===0?' · сьогодні':` · через ${-d} дн.`)};
   return `<div class="card"><h2>Свиноматки · ${S.sows.filter(s=>s.status!=='Вибракувана').length} · за датою опоросу</h2>
    ${S.sows.length?`<div class="stat" style="margin-bottom:6px"><span class="pill preg">Поросних ${cnt('preg')}</span><span class="pill lact">Підсисних ${cnt('lact')}</span><span class="pill open">Холостих ${cnt('open')}</span>${cnt('ret')?`<span class="pill ret">Перегул ${cnt('ret')}</span>`:''}</div>
-   <div class="list">${rows.map(({s,st,r})=>`<button class="li" data-a="sow" data-id="${esc(s.id)}"><div class="main"><div class="t">№ ${esc(s.tag)} <span class="pill ${st.code}">${esc(st.label)}</span></div><div class="s">${esc([st.exp?expTxt(st.exp):'',r?r.p.name:''].filter(Boolean).join(' · '))}</div></div><div class="v">${r?remPill(r):''}</div></button>`).join('')}</div>`
+   <div class="seg" role="group" style="margin:8px 0">${[['list','Список'],['group','За групами'],['state','За станом']].map(([v,l])=>`<button data-a="sv" data-v="${v}" aria-pressed="${sowView===v}">${l}</button>`).join('')}</div>
+   ${(()=>{const row=({s,st,r})=>`<button class="li" data-a="sow" data-id="${esc(s.id)}"><div class="main"><div class="t">№ ${esc(s.tag)} <span class="pill ${st.code}">${esc(st.label)}</span></div><div class="s">${esc([sowView!=='group'&&s.group?gname(s.group):'',st.exp?expTxt(st.exp):'',r?r.p.name:''].filter(Boolean).join(' · '))}</div></div><div class="v">${r?remPill(r):''}</div></button>`;
+     if(sowView==='list')return `<div class="list">${rows.map(row).join('')}</div>`;
+     let sec=[];
+     if(sowView==='group'){const gs=S.groups.filter(g=>g.cat==='Свиноматки'||rows.some(x=>x.s.group===g.id)).sort((a,b)=>(a.t||0)-(b.t||0));
+       sec=gs.map(g=>[g.name,rows.filter(x=>x.s.group===g.id)]);sec.push(['Без групи',rows.filter(x=>!x.s.group||!byId('groups',x.s.group))])}
+     else{const L=[['ret','Перегул'],['preg','Поросні'],['lact','Підсисні'],['open','Холості'],['none','Без подій'],['cull','Вибракувані']];sec=L.map(([c,l])=>[l,rows.filter(x=>x.st.code===c)])}
+     sec=sec.filter(x=>x[1].length);
+     return sec.map(([t,l])=>`<h4 style="margin:14px 0 2px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">${esc(t)} · ${l.length}</h4><div class="list">${l.map(row).join('')}</div>`).join('')+(sowView==='group'?`<p class="hint" style="margin:10px 0 0">Групу свиноматки змінюють у її картці → «Редагувати картку» → «Група». Нову групу додайте нижче в «Групи маточного стада».</p>`:'')})()}`
    :'<p style="margin:0">Внесіть свиноматок поіменно — і застосунок сам рахуватиме очікуваний опорос (осіменіння + 114 днів), обробки перед опоросом, відлучення й наступне осіменіння.</p>'}</div>
    ${semenCard()}
    <div class="btns"><button class="btn" data-a="form" data-k="sow">Додати свиноматку</button>${S.sows.length?'<button class="btn primary" data-a="form" data-k="mate">Осіменіння</button>':''}</div>`;
@@ -775,6 +783,7 @@ document.addEventListener('click',async e=>{
   else if(a==='payout')openForm('supay',null,{supplier:b.dataset.s,sum:b.dataset.v});
   else if(a==='vv'){vetView=b.dataset.v;render()}
   else if(a==='hv'){herdView=b.dataset.v;render()}
+  else if(a==='sv'){sowView=b.dataset.v;try{localStorage.setItem('sowView',sowView)}catch(e){};render()}
   else if(a==='addgroup')openForm('group',null,{cat:b.dataset.cat});
   else if(a==='litter')litterSheet(b.dataset.id);
   else if(a==='godebt'){tab='money';moneyView='debt';window.scrollTo(0,0);render()}
